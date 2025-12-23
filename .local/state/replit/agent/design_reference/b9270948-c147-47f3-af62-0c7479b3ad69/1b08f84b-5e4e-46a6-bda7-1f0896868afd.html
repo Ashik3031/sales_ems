@@ -1,0 +1,974 @@
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sales Leaderboard - Real-Time Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+    tailwind.config = {
+        theme: {
+            extend: {
+                borderRadius: {
+                    lg: "var(--radius)",
+                    md: "calc(var(--radius) - 2px)",
+                    sm: "calc(var(--radius) - 4px)",
+                },
+                colors: {
+                    background: "var(--background)",
+                    foreground: "var(--foreground)",
+                    card: {
+                        DEFAULT: "var(--card)",
+                        foreground: "var(--card-foreground)",
+                    },
+                    popover: {
+                        DEFAULT: "var(--popover)",
+                        foreground: "var(--popover-foreground)",
+                    },
+                    primary: {
+                        DEFAULT: "var(--primary)",
+                        foreground: "var(--primary-foreground)",
+                    },
+                    secondary: {
+                        DEFAULT: "var(--secondary)",
+                        foreground: "var(--secondary-foreground)",
+                    },
+                    muted: {
+                        DEFAULT: "var(--muted)",
+                        foreground: "var(--muted-foreground)",
+                    },
+                    accent: {
+                        DEFAULT: "var(--accent)",
+                        foreground: "var(--accent-foreground)",
+                    },
+                    destructive: {
+                        DEFAULT: "var(--destructive)",
+                        foreground: "var(--destructive-foreground)",
+                    },
+                    border: "var(--border)",
+                    input: "var(--input)",
+                    ring: "var(--ring)",
+                    chart: {
+                        "1": "var(--chart-1)",
+                        "2": "var(--chart-2)",
+                        "3": "var(--chart-3)",
+                        "4": "var(--chart-4)",
+                        "5": "var(--chart-5)",
+                    }
+                },
+                fontFamily: {
+                    sans: ["Inter", "system-ui", "sans-serif"],
+                }
+            },
+        }
+    };
+    </script>
+    <style>
+        :root {
+            --background: hsl(210 40% 98%);
+            --foreground: hsl(222.2 84% 4.9%);
+            --card: hsl(0 0% 100%);
+            --card-foreground: hsl(222.2 84% 4.9%);
+            --popover: hsl(0 0% 100%);
+            --popover-foreground: hsl(222.2 84% 4.9%);
+            --primary: hsl(210 83% 53%);
+            --primary-foreground: hsl(210 40% 98%);
+            --secondary: hsl(210 40% 96%);
+            --secondary-foreground: hsl(222.2 84% 4.9%);
+            --muted: hsl(210 40% 96%);
+            --muted-foreground: hsl(215.4 16.3% 46.9%);
+            --accent: hsl(210 40% 96%);
+            --accent-foreground: hsl(222.2 84% 4.9%);
+            --destructive: hsl(0 84.2% 60.2%);
+            --destructive-foreground: hsl(210 40% 98%);
+            --border: hsl(214.3 31.8% 91.4%);
+            --input: hsl(214.3 31.8% 91.4%);
+            --ring: hsl(210 83% 53%);
+            --radius: 0.5rem;
+            --chart-1: hsl(12 76% 61%);
+            --chart-2: hsl(173 58% 39%);
+            --chart-3: hsl(197 37% 24%);
+            --chart-4: hsl(43 74% 66%);
+            --chart-5: hsl(27 87% 67%);
+        }
+    </style>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+</head>
+<body class="bg-background font-sans text-foreground">
+    <!-- Navigation Bar -->
+    <nav class="bg-card border-b border-border shadow-sm">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <div class="flex items-center space-x-4">
+                    <div class="flex-shrink-0">
+                        <h1 class="text-xl font-bold text-primary">Sales Leaderboard</h1>
+                    </div>
+                    <div class="hidden md:block">
+                        <div class="flex space-x-1">
+                            <button data-view="leaderboard" class="bg-primary text-primary-foreground px-3 py-2 rounded-md text-sm font-medium">
+                                <i class="fas fa-trophy mr-2"></i>Leaderboard
+                            </button>
+                            <button data-view="tl-dashboard" class="text-muted-foreground hover:text-foreground px-3 py-2 rounded-md text-sm font-medium">
+                                <i class="fas fa-users mr-2"></i>TL Dashboard
+                            </button>
+                            <button data-view="admin" class="text-muted-foreground hover:text-foreground px-3 py-2 rounded-md text-sm font-medium">
+                                <i class="fas fa-cog mr-2"></i>Admin
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <button id="soundToggle" class="text-muted-foreground hover:text-foreground">
+                        <i class="fas fa-volume-up text-lg"></i>
+                    </button>
+                    <button class="text-muted-foreground hover:text-foreground">
+                        <i class="fas fa-tv text-lg" title="TV Mode"></i>
+                    </button>
+                    <div class="hidden md:block text-sm text-muted-foreground">
+                        <span class="inline-flex items-center">
+                            <div class="w-2 h-2 bg-green-500 rounded-full mr-2"></div>
+                            Live
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- @COMPONENT: LeaderboardView -->
+    <div id="leaderboard-view" class="view-container">
+        <!-- Top Stats Bar -->
+        <div class="bg-card border-b border-border">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                    <!-- Top Agent of the Month -->
+                    <div class="bg-gradient-to-r from-yellow-50 to-yellow-100 border border-yellow-200 rounded-lg p-4">
+                        <div class="flex items-center space-x-3">
+                            <!-- Agent photo placeholder -->
+                            <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=64&h=64&fit=crop&crop=face" 
+                                 alt="Top agent photo" class="w-12 h-12 rounded-full object-cover border-2 border-yellow-300">
+                            <div class="flex-1">
+                                <p class="text-xs font-medium text-yellow-700 uppercase tracking-wider">🏆 Top Agent (Month)</p>
+                                <p class="text-lg font-bold text-yellow-900" data-bind="topAgentMonth.name">Sarah Chen</p>
+                                <p class="text-sm text-yellow-700" data-bind="topAgentMonth.activations">47 activations</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Top Agent Today -->
+                    <div class="bg-gradient-to-r from-blue-50 to-blue-100 border border-blue-200 rounded-lg p-4">
+                        <div class="flex items-center space-x-3">
+                            <!-- Agent photo placeholder -->
+                            <img src="https://pixabay.com/get/gcc06894c2bb80b0fad94d452ade1c5cf49bdc4d02396e4eb120ee0694106723859dd027a1802d8dc741fb5786e283f0bbb08c788d4a184772fc88ffa6cb777be_1280.jpg" 
+                                 alt="Top daily agent photo" class="w-12 h-12 rounded-full object-cover border-2 border-blue-300">
+                            <div class="flex-1">
+                                <p class="text-xs font-medium text-blue-700 uppercase tracking-wider">⚡ Top Agent (Today)</p>
+                                <p class="text-lg font-bold text-blue-900" data-bind="topAgentToday.name">Mike Rodriguez</p>
+                                <p class="text-sm text-blue-700" data-bind="topAgentToday.submissions">23 submissions</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Total Activations -->
+                    <div class="bg-gradient-to-r from-green-50 to-green-100 border border-green-200 rounded-lg p-4">
+                        <div class="text-center">
+                            <p class="text-xs font-medium text-green-700 uppercase tracking-wider">🔄 Total Activations</p>
+                            <p class="text-3xl font-bold text-green-900" data-bind="totalActivations">342</p>
+                            <p class="text-sm text-green-700">All teams</p>
+                        </div>
+                    </div>
+
+                    <!-- Total Submissions -->
+                    <div class="bg-gradient-to-r from-purple-50 to-purple-100 border border-purple-200 rounded-lg p-4">
+                        <div class="text-center">
+                            <p class="text-xs font-medium text-purple-700 uppercase tracking-wider">📝 Total Submissions</p>
+                            <p class="text-3xl font-bold text-purple-900" data-bind="totalSubmissions">1,247</p>
+                            <p class="text-sm text-purple-700">All teams</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Team Cards Grid -->
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                <!-- @MAP: teams.map(team => ( -->
+                <!-- Team Alpha Card -->
+                <div class="bg-card rounded-lg shadow-lg border border-border overflow-hidden">
+                    <!-- Team Header -->
+                    <div class="bg-primary text-primary-foreground p-6">
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center space-x-4">
+                                <!-- TL photo placeholder -->
+                                <img src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=64&h=64&fit=crop&crop=face" 
+                                     alt="Team leader photo" class="w-14 h-14 rounded-full object-cover border-3 border-white/20">
+                                <div>
+                                    <h3 class="text-xl font-bold" data-bind="team.name">Team Alpha</h3>
+                                    <p class="text-primary-foreground/80" data-bind="team.tlName">John Smith - Team Leader</p>
+                                </div>
+                            </div>
+                            <div class="text-right">
+                                <div class="text-3xl font-bold" data-bind="team.avgActivation">78%</div>
+                                <div class="text-sm text-primary-foreground/80">Avg Activation</div>
+                            </div>
+                        </div>
+                        
+                        <!-- Team Stats -->
+                        <div class="flex justify-between items-center mt-4 pt-4 border-t border-primary-foreground/20">
+                            <div class="text-center">
+                                <div class="text-2xl font-bold" data-bind="team.totalActivations">156</div>
+                                <div class="text-xs text-primary-foreground/80 uppercase">Activations</div>
+                            </div>
+                            <div class="text-center">
+                                <div class="text-2xl font-bold" data-bind="team.totalSubmissions">623</div>
+                                <div class="text-xs text-primary-foreground/80 uppercase">Submissions</div>
+                            </div>
+                            <div class="text-center">
+                                <div class="text-2xl font-bold" data-bind="team.totalPoints">2,847</div>
+                                <div class="text-xs text-primary-foreground/80 uppercase">Points</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Agents List -->
+                    <div class="p-6">
+                        <!-- @MAP: team.agents.map(agent => ( -->
+                        <!-- Agent Row 1 -->
+                        <div class="flex items-center justify-between py-3 border-b border-border last:border-b-0">
+                            <div class="flex items-center space-x-3">
+                                <!-- Agent photo placeholder -->
+                                <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=48&h=48&fit=crop&crop=face" 
+                                     alt="Agent photo" class="w-12 h-12 rounded-full object-cover">
+                                <div>
+                                    <p class="font-semibold text-foreground" data-bind="agent.name">Sarah Chen</p>
+                                    <div class="flex items-center space-x-4 text-sm text-muted-foreground">
+                                        <span data-bind="agent.activations">23 activations</span>
+                                        <span data-bind="agent.submissions">89 submissions</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="text-right">
+                                <div class="text-2xl font-bold text-green-600" data-bind="agent.activationPercent">92%</div>
+                                <div class="w-24 bg-gray-200 rounded-full h-2 mt-1">
+                                    <div class="bg-green-600 h-2 rounded-full" style="width: 92%"></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Agent Row 2 -->
+                        <div class="flex items-center justify-between py-3 border-b border-border last:border-b-0">
+                            <div class="flex items-center space-x-3">
+                                <!-- Agent photo placeholder -->
+                                <img src="https://pixabay.com/get/gcc06894c2bb80b0fad94d452ade1c5cf49bdc4d02396e4eb120ee0694106723859dd027a1802d8dc741fb5786e283f0bbb08c788d4a184772fc88ffa6cb777be_1280.jpg" 
+                                     alt="Agent photo" class="w-12 h-12 rounded-full object-cover">
+                                <div>
+                                    <p class="font-semibold text-foreground" data-bind="agent.name">Lisa Wong</p>
+                                    <div class="flex items-center space-x-4 text-sm text-muted-foreground">
+                                        <span data-bind="agent.activations">19 activations</span>
+                                        <span data-bind="agent.submissions">67 submissions</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="text-right">
+                                <div class="text-2xl font-bold text-yellow-600" data-bind="agent.activationPercent">76%</div>
+                                <div class="w-24 bg-gray-200 rounded-full h-2 mt-1">
+                                    <div class="bg-yellow-600 h-2 rounded-full" style="width: 76%"></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Agent Row 3 -->
+                        <div class="flex items-center justify-between py-3 border-b border-border last:border-b-0">
+                            <div class="flex items-center space-x-3">
+                                <!-- Agent photo placeholder -->
+                                <img src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=48&h=48&fit=crop&crop=face" 
+                                     alt="Agent photo" class="w-12 h-12 rounded-full object-cover">
+                                <div>
+                                    <p class="font-semibold text-foreground" data-bind="agent.name">David Park</p>
+                                    <div class="flex items-center space-x-4 text-sm text-muted-foreground">
+                                        <span data-bind="agent.activations">12 activations</span>
+                                        <span data-bind="agent.submissions">54 submissions</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="text-right">
+                                <div class="text-2xl font-bold text-orange-600" data-bind="agent.activationPercent">60%</div>
+                                <div class="w-24 bg-gray-200 rounded-full h-2 mt-1">
+                                    <div class="bg-orange-600 h-2 rounded-full" style="width: 60%"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- @END_MAP )) -->
+                    </div>
+                </div>
+
+                <!-- Team Bravo Card -->
+                <div class="bg-card rounded-lg shadow-lg border border-border overflow-hidden">
+                    <!-- Team Header -->
+                    <div class="bg-secondary text-secondary-foreground p-6">
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center space-x-4">
+                                <!-- TL photo placeholder -->
+                                <img src="https://images.unsplash.com/photo-1560250097-0b93528c311a?w=64&h=64&fit=crop&crop=face" 
+                                     alt="Team leader photo" class="w-14 h-14 rounded-full object-cover border-3 border-gray-300">
+                                <div>
+                                    <h3 class="text-xl font-bold" data-bind="team.name">Team Bravo</h3>
+                                    <p class="text-secondary-foreground/80" data-bind="team.tlName">Maria Garcia - Team Leader</p>
+                                </div>
+                            </div>
+                            <div class="text-right">
+                                <div class="text-3xl font-bold" data-bind="team.avgActivation">71%</div>
+                                <div class="text-sm text-secondary-foreground/80">Avg Activation</div>
+                            </div>
+                        </div>
+                        
+                        <!-- Team Stats -->
+                        <div class="flex justify-between items-center mt-4 pt-4 border-t border-secondary-foreground/20">
+                            <div class="text-center">
+                                <div class="text-2xl font-bold" data-bind="team.totalActivations">128</div>
+                                <div class="text-xs text-secondary-foreground/80 uppercase">Activations</div>
+                            </div>
+                            <div class="text-center">
+                                <div class="text-2xl font-bold" data-bind="team.totalSubmissions">567</div>
+                                <div class="text-xs text-secondary-foreground/80 uppercase">Submissions</div>
+                            </div>
+                            <div class="text-center">
+                                <div class="text-2xl font-bold" data-bind="team.totalPoints">2,134</div>
+                                <div class="text-xs text-secondary-foreground/80 uppercase">Points</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Agents List -->
+                    <div class="p-6">
+                        <!-- Agent Row 1 -->
+                        <div class="flex items-center justify-between py-3 border-b border-border last:border-b-0">
+                            <div class="flex items-center space-x-3">
+                                <!-- Agent photo placeholder -->
+                                <img src="https://images.unsplash.com/photo-1519345182560-3f2917c472ef?w=48&h=48&fit=crop&crop=face" 
+                                     alt="Agent photo" class="w-12 h-12 rounded-full object-cover">
+                                <div>
+                                    <p class="font-semibold text-foreground" data-bind="agent.name">Mike Rodriguez</p>
+                                    <div class="flex items-center space-x-4 text-sm text-muted-foreground">
+                                        <span data-bind="agent.activations">21 activations</span>
+                                        <span data-bind="agent.submissions">78 submissions</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="text-right">
+                                <div class="text-2xl font-bold text-green-600" data-bind="agent.activationPercent">84%</div>
+                                <div class="w-24 bg-gray-200 rounded-full h-2 mt-1">
+                                    <div class="bg-green-600 h-2 rounded-full" style="width: 84%"></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Agent Row 2 -->
+                        <div class="flex items-center justify-between py-3 border-b border-border last:border-b-0">
+                            <div class="flex items-center space-x-3">
+                                <!-- Agent photo placeholder -->
+                                <img src="https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=48&h=48&fit=crop&crop=face" 
+                                     alt="Agent photo" class="w-12 h-12 rounded-full object-cover">
+                                <div>
+                                    <p class="font-semibold text-foreground" data-bind="agent.name">Emma Thompson</p>
+                                    <div class="flex items-center space-x-4 text-sm text-muted-foreground">
+                                        <span data-bind="agent.activations">16 activations</span>
+                                        <span data-bind="agent.submissions">61 submissions</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="text-right">
+                                <div class="text-2xl font-bold text-yellow-600" data-bind="agent.activationPercent">67%</div>
+                                <div class="w-24 bg-gray-200 rounded-full h-2 mt-1">
+                                    <div class="bg-yellow-600 h-2 rounded-full" style="width: 67%"></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Agent Row 3 -->
+                        <div class="flex items-center justify-between py-3 border-b border-border last:border-b-0">
+                            <div class="flex items-center space-x-3">
+                                <!-- Agent photo placeholder -->
+                                <img src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=48&h=48&fit=crop&crop=face" 
+                                     alt="Agent photo" class="w-12 h-12 rounded-full object-cover">
+                                <div>
+                                    <p class="font-semibold text-foreground" data-bind="agent.name">Ryan Lee</p>
+                                    <div class="flex items-center space-x-4 text-sm text-muted-foreground">
+                                        <span data-bind="agent.activations">9 activations</span>
+                                        <span data-bind="agent.submissions">43 submissions</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="text-right">
+                                <div class="text-2xl font-bold text-red-600" data-bind="agent.activationPercent">45%</div>
+                                <div class="w-24 bg-gray-200 rounded-full h-2 mt-1">
+                                    <div class="bg-red-600 h-2 rounded-full" style="width: 45%"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- @END_MAP )) -->
+            </div>
+        </div>
+    </div>
+    <!-- @END_COMPONENT: LeaderboardView -->
+
+    <!-- @COMPONENT: TLDashboard -->
+    <div id="tl-dashboard-view" class="view-container hidden">
+        <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            <div class="mb-8">
+                <h2 class="text-3xl font-bold text-foreground">Team Leader Dashboard</h2>
+                <p class="text-muted-foreground mt-2">Manage your team's performance metrics</p>
+            </div>
+
+            <!-- Team Info Card -->
+            <div class="bg-card rounded-lg shadow-sm border border-border p-6 mb-8">
+                <div class="flex items-center space-x-4">
+                    <!-- TL photo placeholder -->
+                    <img src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=64&h=64&fit=crop&crop=face" 
+                         alt="Team leader photo" class="w-16 h-16 rounded-full object-cover">
+                    <div>
+                        <h3 class="text-xl font-bold text-foreground" data-bind="tl.name">John Smith</h3>
+                        <p class="text-muted-foreground" data-bind="team.name">Team Alpha</p>
+                        <div class="flex items-center space-x-4 mt-2 text-sm">
+                            <span class="text-green-600 font-semibold">156 Total Activations</span>
+                            <span class="text-blue-600 font-semibold">623 Total Submissions</span>
+                            <span class="text-purple-600 font-semibold">78% Avg Rate</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Agents Management Table -->
+            <div class="bg-card rounded-lg shadow-sm border border-border overflow-hidden">
+                <div class="px-6 py-4 border-b border-border">
+                    <h3 class="text-lg font-semibold text-foreground">Agent Performance Management</h3>
+                    <p class="text-sm text-muted-foreground">Update agent metrics with +/- buttons</p>
+                </div>
+                
+                <div class="overflow-x-auto">
+                    <table class="w-full">
+                        <thead class="bg-muted">
+                            <tr>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">Agent</th>
+                                <th class="px-6 py-3 text-center text-xs font-medium text-muted-foreground uppercase tracking-wider">Submissions</th>
+                                <th class="px-6 py-3 text-center text-xs font-medium text-muted-foreground uppercase tracking-wider">Activations</th>
+                                <th class="px-6 py-3 text-center text-xs font-medium text-muted-foreground uppercase tracking-wider">Points</th>
+                                <th class="px-6 py-3 text-center text-xs font-medium text-muted-foreground uppercase tracking-wider">Rate</th>
+                            </tr>
+                        </thead>
+                        <tbody class="bg-card divide-y divide-border">
+                            <!-- @MAP: agents.map(agent => ( -->
+                            <tr class="hover:bg-muted/50 transition-colors">
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <div class="flex items-center">
+                                        <!-- Agent photo placeholder -->
+                                        <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=48&h=48&fit=crop&crop=face" 
+                                             alt="Agent photo" class="w-12 h-12 rounded-full object-cover mr-4">
+                                        <div>
+                                            <div class="text-sm font-medium text-foreground" data-bind="agent.name">Sarah Chen</div>
+                                            <div class="text-sm text-muted-foreground">Target: <span data-bind="agent.activationTarget">25</span></div>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap text-center">
+                                    <div class="flex items-center justify-center space-x-2">
+                                        <button class="w-8 h-8 bg-red-100 hover:bg-red-200 text-red-600 rounded-full flex items-center justify-center transition-colors" 
+                                                data-event="click:decrementSubmissions" data-implementation="Decrement agent submissions">
+                                            <i class="fas fa-minus text-xs"></i>
+                                        </button>
+                                        <span class="text-lg font-semibold text-foreground min-w-[3rem]" data-bind="agent.submissions">89</span>
+                                        <button class="w-8 h-8 bg-green-100 hover:bg-green-200 text-green-600 rounded-full flex items-center justify-center transition-colors" 
+                                                data-event="click:incrementSubmissions" data-implementation="Increment agent submissions">
+                                            <i class="fas fa-plus text-xs"></i>
+                                        </button>
+                                    </div>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap text-center">
+                                    <div class="flex items-center justify-center space-x-2">
+                                        <button class="w-8 h-8 bg-red-100 hover:bg-red-200 text-red-600 rounded-full flex items-center justify-center transition-colors" 
+                                                data-event="click:decrementActivations" data-implementation="Decrement agent activations">
+                                            <i class="fas fa-minus text-xs"></i>
+                                        </button>
+                                        <span class="text-lg font-semibold text-foreground min-w-[3rem]" data-bind="agent.activations">23</span>
+                                        <button class="w-8 h-8 bg-green-100 hover:bg-green-200 text-green-600 rounded-full flex items-center justify-center transition-colors" 
+                                                data-event="click:incrementActivations" data-implementation="Increment agent activations and trigger celebration popup">
+                                            <i class="fas fa-plus text-xs"></i>
+                                        </button>
+                                    </div>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap text-center">
+                                    <div class="flex items-center justify-center space-x-2">
+                                        <button class="w-8 h-8 bg-red-100 hover:bg-red-200 text-red-600 rounded-full flex items-center justify-center transition-colors" 
+                                                data-event="click:decrementPoints" data-implementation="Decrement agent points">
+                                            <i class="fas fa-minus text-xs"></i>
+                                        </button>
+                                        <span class="text-lg font-semibold text-foreground min-w-[3rem]" data-bind="agent.points">1,234</span>
+                                        <button class="w-8 h-8 bg-green-100 hover:bg-green-200 text-green-600 rounded-full flex items-center justify-center transition-colors" 
+                                                data-event="click:incrementPoints" data-implementation="Increment agent points">
+                                            <i class="fas fa-plus text-xs"></i>
+                                        </button>
+                                    </div>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap text-center">
+                                    <div class="flex items-center justify-center">
+                                        <span class="text-lg font-bold text-green-600" data-bind="agent.activationPercent">92%</span>
+                                    </div>
+                                </td>
+                            </tr>
+
+                            <tr class="hover:bg-muted/50 transition-colors">
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <div class="flex items-center">
+                                        <!-- Agent photo placeholder -->
+                                        <img src="https://pixabay.com/get/gcc06894c2bb80b0fad94d452ade1c5cf49bdc4d02396e4eb120ee0694106723859dd027a1802d8dc741fb5786e283f0bbb08c788d4a184772fc88ffa6cb777be_1280.jpg" 
+                                             alt="Agent photo" class="w-12 h-12 rounded-full object-cover mr-4">
+                                        <div>
+                                            <div class="text-sm font-medium text-foreground" data-bind="agent.name">Lisa Wong</div>
+                                            <div class="text-sm text-muted-foreground">Target: <span data-bind="agent.activationTarget">25</span></div>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap text-center">
+                                    <div class="flex items-center justify-center space-x-2">
+                                        <button class="w-8 h-8 bg-red-100 hover:bg-red-200 text-red-600 rounded-full flex items-center justify-center transition-colors">
+                                            <i class="fas fa-minus text-xs"></i>
+                                        </button>
+                                        <span class="text-lg font-semibold text-foreground min-w-[3rem]" data-bind="agent.submissions">67</span>
+                                        <button class="w-8 h-8 bg-green-100 hover:bg-green-200 text-green-600 rounded-full flex items-center justify-center transition-colors">
+                                            <i class="fas fa-plus text-xs"></i>
+                                        </button>
+                                    </div>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap text-center">
+                                    <div class="flex items-center justify-center space-x-2">
+                                        <button class="w-8 h-8 bg-red-100 hover:bg-red-200 text-red-600 rounded-full flex items-center justify-center transition-colors">
+                                            <i class="fas fa-minus text-xs"></i>
+                                        </button>
+                                        <span class="text-lg font-semibold text-foreground min-w-[3rem]" data-bind="agent.activations">19</span>
+                                        <button class="w-8 h-8 bg-green-100 hover:bg-green-200 text-green-600 rounded-full flex items-center justify-center transition-colors">
+                                            <i class="fas fa-plus text-xs"></i>
+                                        </button>
+                                    </div>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap text-center">
+                                    <div class="flex items-center justify-center space-x-2">
+                                        <button class="w-8 h-8 bg-red-100 hover:bg-red-200 text-red-600 rounded-full flex items-center justify-center transition-colors">
+                                            <i class="fas fa-minus text-xs"></i>
+                                        </button>
+                                        <span class="text-lg font-semibold text-foreground min-w-[3rem]" data-bind="agent.points">987</span>
+                                        <button class="w-8 h-8 bg-green-100 hover:bg-green-200 text-green-600 rounded-full flex items-center justify-center transition-colors">
+                                            <i class="fas fa-plus text-xs"></i>
+                                        </button>
+                                    </div>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap text-center">
+                                    <div class="flex items-center justify-center">
+                                        <span class="text-lg font-bold text-yellow-600" data-bind="agent.activationPercent">76%</span>
+                                    </div>
+                                </td>
+                            </tr>
+
+                            <tr class="hover:bg-muted/50 transition-colors">
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <div class="flex items-center">
+                                        <!-- Agent photo placeholder -->
+                                        <img src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=48&h=48&fit=crop&crop=face" 
+                                             alt="Agent photo" class="w-12 h-12 rounded-full object-cover mr-4">
+                                        <div>
+                                            <div class="text-sm font-medium text-foreground" data-bind="agent.name">David Park</div>
+                                            <div class="text-sm text-muted-foreground">Target: <span data-bind="agent.activationTarget">20</span></div>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap text-center">
+                                    <div class="flex items-center justify-center space-x-2">
+                                        <button class="w-8 h-8 bg-red-100 hover:bg-red-200 text-red-600 rounded-full flex items-center justify-center transition-colors">
+                                            <i class="fas fa-minus text-xs"></i>
+                                        </button>
+                                        <span class="text-lg font-semibold text-foreground min-w-[3rem]" data-bind="agent.submissions">54</span>
+                                        <button class="w-8 h-8 bg-green-100 hover:bg-green-200 text-green-600 rounded-full flex items-center justify-center transition-colors">
+                                            <i class="fas fa-plus text-xs"></i>
+                                        </button>
+                                    </div>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap text-center">
+                                    <div class="flex items-center justify-center space-x-2">
+                                        <button class="w-8 h-8 bg-red-100 hover:bg-red-200 text-red-600 rounded-full flex items-center justify-center transition-colors">
+                                            <i class="fas fa-minus text-xs"></i>
+                                        </button>
+                                        <span class="text-lg font-semibold text-foreground min-w-[3rem]" data-bind="agent.activations">12</span>
+                                        <button class="w-8 h-8 bg-green-100 hover:bg-green-200 text-green-600 rounded-full flex items-center justify-center transition-colors">
+                                            <i class="fas fa-plus text-xs"></i>
+                                        </button>
+                                    </div>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap text-center">
+                                    <div class="flex items-center justify-center space-x-2">
+                                        <button class="w-8 h-8 bg-red-100 hover:bg-red-200 text-red-600 rounded-full flex items-center justify-center transition-colors">
+                                            <i class="fas fa-minus text-xs"></i>
+                                        </button>
+                                        <span class="text-lg font-semibold text-foreground min-w-[3rem]" data-bind="agent.points">678</span>
+                                        <button class="w-8 h-8 bg-green-100 hover:bg-green-200 text-green-600 rounded-full flex items-center justify-center transition-colors">
+                                            <i class="fas fa-plus text-xs"></i>
+                                        </button>
+                                    </div>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap text-center">
+                                    <div class="flex items-center justify-center">
+                                        <span class="text-lg font-bold text-orange-600" data-bind="agent.activationPercent">60%</span>
+                                    </div>
+                                </td>
+                            </tr>
+                            <!-- @END_MAP )) -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- @END_COMPONENT: TLDashboard -->
+
+    <!-- @COMPONENT: AdminDashboard -->
+    <div id="admin-view" class="view-container hidden">
+        <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            <div class="mb-8">
+                <h2 class="text-3xl font-bold text-foreground">Admin Dashboard</h2>
+                <p class="text-muted-foreground mt-2">Manage notifications and system settings</p>
+            </div>
+
+            <!-- Notification Management -->
+            <div class="bg-card rounded-lg shadow-sm border border-border p-6 mb-8">
+                <h3 class="text-xl font-semibold text-foreground mb-4">Push Takeover Notification</h3>
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-medium text-foreground mb-2">Notification Type</label>
+                        <select class="w-full px-3 py-2 border border-input rounded-md bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-ring">
+                            <option value="text">Text Message</option>
+                            <option value="image">Image</option>
+                            <option value="video">Video</option>
+                            <option value="audio">Audio</option>
+                        </select>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-foreground mb-2">Title (Optional)</label>
+                            <input type="text" placeholder="Notification title" 
+                                   class="w-full px-3 py-2 border border-input rounded-md bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-ring">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-foreground mb-2">Duration (seconds)</label>
+                            <input type="number" value="15" min="1" max="300" 
+                                   class="w-full px-3 py-2 border border-input rounded-md bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-ring">
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-foreground mb-2">Message</label>
+                        <textarea rows="3" placeholder="Enter your message here..." 
+                                  class="w-full px-3 py-2 border border-input rounded-md bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-ring"></textarea>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-foreground mb-2">Media URL (for image/video/audio)</label>
+                        <input type="url" placeholder="https://example.com/media.jpg" 
+                               class="w-full px-3 py-2 border border-input rounded-md bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-ring">
+                    </div>
+
+                    <div class="flex space-x-3">
+                        <button class="bg-primary text-primary-foreground px-6 py-2 rounded-md hover:bg-primary/90 transition-colors" 
+                                data-event="click:pushNotification" data-implementation="Send notification to all clients">
+                            <i class="fas fa-broadcast-tower mr-2"></i>Push Notification
+                        </button>
+                        <button class="bg-secondary text-secondary-foreground px-6 py-2 rounded-md hover:bg-secondary/90 transition-colors" 
+                                data-event="click:clearNotification" data-implementation="Clear active notification">
+                            <i class="fas fa-times-circle mr-2"></i>Clear Active
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- System Settings -->
+            <div class="bg-card rounded-lg shadow-sm border border-border p-6">
+                <h3 class="text-xl font-semibold text-foreground mb-4">System Settings</h3>
+                <div class="space-y-6">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                            <label class="block text-sm font-medium text-foreground mb-2">Default Popup Duration (ms)</label>
+                            <input type="number" value="5000" min="1000" max="30000" step="1000" 
+                                   class="w-full px-3 py-2 border border-input rounded-md bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-ring">
+                            <p class="text-xs text-muted-foreground mt-1">Duration for celebration popups</p>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-foreground mb-2">Default Notification Duration (ms)</label>
+                            <input type="number" value="15000" min="5000" max="300000" step="1000" 
+                                   class="w-full px-3 py-2 border border-input rounded-md bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-ring">
+                            <p class="text-xs text-muted-foreground mt-1">Duration for takeover notifications</p>
+                        </div>
+                    </div>
+
+                    <div class="flex items-center justify-between p-4 bg-muted rounded-lg">
+                        <div>
+                            <h4 class="text-sm font-medium text-foreground">Global Sound</h4>
+                            <p class="text-xs text-muted-foreground">Enable/disable sound for all celebration popups</p>
+                        </div>
+                        <label class="relative inline-flex items-center cursor-pointer">
+                            <input type="checkbox" checked class="sr-only peer">
+                            <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
+                        </label>
+                    </div>
+
+                    <button class="bg-green-600 text-white px-6 py-2 rounded-md hover:bg-green-700 transition-colors" 
+                            data-event="click:saveSettings" data-implementation="Save admin settings">
+                        <i class="fas fa-save mr-2"></i>Save Settings
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- @END_COMPONENT: AdminDashboard -->
+
+    <!-- @COMPONENT: CelebrationPopup -->
+    <div id="celebration-popup" class="fixed inset-0 bg-black/50 flex items-center justify-center z-50 hidden" data-implementation="Show when activation is added">
+        <div class="bg-card rounded-2xl shadow-2xl p-8 max-w-md w-full mx-4 text-center relative overflow-hidden">
+            <!-- Confetti Animation Area -->
+            <div class="absolute inset-0 pointer-events-none" id="confetti-container">
+                <!-- @FUNCTIONALITY: This should implement confetti animation using canvas or CSS animations -->
+            </div>
+            
+            <div class="relative z-10">
+                <!-- Celebration Icon -->
+                <div class="w-20 h-20 bg-gradient-to-r from-yellow-400 to-orange-500 rounded-full mx-auto mb-4 flex items-center justify-center text-3xl">
+                    🎉
+                </div>
+
+                <!-- Agent Info -->
+                <div class="mb-6">
+                    <!-- Agent photo placeholder -->
+                    <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=96&h=96&fit=crop&crop=face" 
+                         alt="Celebrating agent" class="w-24 h-24 rounded-full mx-auto mb-4 border-4 border-yellow-400 shadow-lg" 
+                         data-bind="celebratingAgent.photoUrl">
+                    <h3 class="text-2xl font-bold text-foreground mb-2" data-bind="celebratingAgent.name">Sarah Chen</h3>
+                    <p class="text-lg text-muted-foreground">New Activation!</p>
+                    <p class="text-3xl font-bold text-green-600 mt-2" data-bind="celebratingAgent.newActivationCount">24 activations</p>
+                </div>
+
+                <!-- Sound Toggle -->
+                <button class="absolute top-4 right-4 text-muted-foreground hover:text-foreground transition-colors" 
+                        data-event="click:toggleCelebrationSound" data-implementation="Toggle sound for celebration">
+                    <i class="fas fa-volume-up text-lg"></i>
+                </button>
+
+                <!-- Close Button -->
+                <button class="bg-primary text-primary-foreground px-6 py-2 rounded-lg hover:bg-primary/90 transition-colors" 
+                        data-event="click:closeCelebrationPopup" data-implementation="Close celebration popup">
+                    Awesome!
+                </button>
+            </div>
+        </div>
+    </div>
+    <!-- @END_COMPONENT: CelebrationPopup -->
+
+    <!-- @COMPONENT: NotificationTakeover -->
+    <div id="notification-takeover" class="fixed inset-0 bg-background z-50 hidden" data-implementation="Show for admin notifications">
+        <div class="h-full flex flex-col">
+            <!-- Header -->
+            <div class="bg-card border-b border-border px-6 py-4 flex justify-between items-center">
+                <div>
+                    <h2 class="text-2xl font-bold text-foreground" data-bind="notification.title">Important Announcement</h2>
+                    <p class="text-sm text-muted-foreground">Notification from Administration</p>
+                </div>
+                <button class="text-muted-foreground hover:text-foreground transition-colors" 
+                        data-event="click:closeNotification" data-implementation="Close notification manually">
+                    <i class="fas fa-times text-2xl"></i>
+                </button>
+            </div>
+
+            <!-- Content -->
+            <div class="flex-1 flex items-center justify-center p-8">
+                <div class="max-w-4xl w-full text-center">
+                    <!-- Text Notification -->
+                    <div id="text-notification" class="space-y-6">
+                        <div class="text-6xl mb-8">📢</div>
+                        <p class="text-2xl text-foreground leading-relaxed" data-bind="notification.message">
+                            Team meeting in Conference Room A at 3:00 PM. Please bring your weekly reports and be prepared to discuss your current pipeline status.
+                        </p>
+                    </div>
+
+                    <!-- Image Notification -->
+                    <div id="image-notification" class="hidden">
+                        <!-- Company event announcement image -->
+                        <img src="https://images.unsplash.com/photo-1552664730-d307ca884978?w=800&h=600&fit=crop" 
+                             alt="Notification image" class="max-w-full h-auto rounded-lg shadow-lg mx-auto" 
+                             data-bind="notification.mediaUrl">
+                    </div>
+
+                    <!-- Video Notification -->
+                    <div id="video-notification" class="hidden">
+                        <video controls class="max-w-full h-auto rounded-lg shadow-lg mx-auto" data-bind="notification.mediaUrl">
+                            <source src="#" type="video/mp4">
+                            Your browser does not support the video tag.
+                        </video>
+                    </div>
+
+                    <!-- Audio Notification -->
+                    <div id="audio-notification" class="hidden space-y-6">
+                        <div class="text-6xl mb-8">🎵</div>
+                        <audio controls class="w-full max-w-md mx-auto" data-bind="notification.mediaUrl">
+                            <source src="#" type="audio/mpeg">
+                            Your browser does not support the audio element.
+                        </audio>
+                        <p class="text-lg text-muted-foreground">Audio message from Administration</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Footer -->
+            <div class="bg-card border-t border-border px-6 py-4 text-center">
+                <div class="flex items-center justify-center space-x-4 text-sm text-muted-foreground">
+                    <span>This notification will auto-close in <span class="font-bold" data-bind="notification.remainingTime">12</span> seconds</span>
+                    <span>•</span>
+                    <button class="text-primary hover:text-primary/80 transition-colors" 
+                            data-event="click:closeNotification" data-implementation="Close notification manually">
+                        Close Now
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- @END_COMPONENT: NotificationTakeover -->
+
+    <script>
+        (function() {
+            // View switching functionality
+            const viewButtons = document.querySelectorAll('[data-view]');
+            const viewContainers = document.querySelectorAll('.view-container');
+
+            function showView(viewName) {
+                // Hide all views
+                viewContainers.forEach(container => {
+                    container.classList.add('hidden');
+                });
+
+                // Show selected view
+                const targetView = document.getElementById(viewName + '-view');
+                if (targetView) {
+                    targetView.classList.remove('hidden');
+                }
+
+                // Update button states
+                viewButtons.forEach(btn => {
+                    if (btn.dataset.view === viewName) {
+                        btn.classList.add('bg-primary', 'text-primary-foreground');
+                        btn.classList.remove('text-muted-foreground', 'hover:text-foreground');
+                    } else {
+                        btn.classList.remove('bg-primary', 'text-primary-foreground');
+                        btn.classList.add('text-muted-foreground', 'hover:text-foreground');
+                    }
+                });
+            }
+
+            // Add click handlers for view switching
+            viewButtons.forEach(button => {
+                button.addEventListener('click', () => {
+                    showView(button.dataset.view);
+                });
+            });
+
+            // Sound toggle functionality
+            const soundToggle = document.getElementById('soundToggle');
+            let soundEnabled = localStorage.getItem('soundEnabled') !== 'false'; // Default true
+
+            function updateSoundIcon() {
+                const icon = soundToggle.querySelector('i');
+                icon.className = soundEnabled ? 'fas fa-volume-up text-lg' : 'fas fa-volume-mute text-lg';
+            }
+
+            soundToggle.addEventListener('click', () => {
+                soundEnabled = !soundEnabled;
+                localStorage.setItem('soundEnabled', soundEnabled);
+                updateSoundIcon();
+            });
+
+            updateSoundIcon();
+
+            // Demo functionality for celebration popup
+            const celebrationPopup = document.getElementById('celebration-popup');
+            const activationButtons = document.querySelectorAll('[data-event*="incrementActivations"]');
+
+            activationButtons.forEach(button => {
+                button.addEventListener('click', () => {
+                    // TODO: Implement real activation increment logic
+                    showCelebrationPopup();
+                });
+            });
+
+            function showCelebrationPopup() {
+                celebrationPopup.classList.remove('hidden');
+                // TODO: Play celebration sound if enabled
+                // TODO: Trigger confetti animation
+                
+                // Auto-close after default duration
+                setTimeout(() => {
+                    celebrationPopup.classList.add('hidden');
+                }, 5000); // Default 5 seconds
+            }
+
+            // Close celebration popup
+            const closeCelebrationBtn = document.querySelector('[data-event*="closeCelebrationPopup"]');
+            if (closeCelebrationBtn) {
+                closeCelebrationBtn.addEventListener('click', () => {
+                    celebrationPopup.classList.add('hidden');
+                });
+            }
+
+            // Demo notification functionality
+            const pushNotificationBtn = document.querySelector('[data-event*="pushNotification"]');
+            const notificationTakeover = document.getElementById('notification-takeover');
+
+            if (pushNotificationBtn) {
+                pushNotificationBtn.addEventListener('click', () => {
+                    // TODO: Send notification to server
+                    showNotificationTakeover();
+                });
+            }
+
+            function showNotificationTakeover() {
+                notificationTakeover.classList.remove('hidden');
+                
+                // Auto-close timer
+                let remainingTime = 15;
+                const timeSpan = document.querySelector('[data-bind="notification.remainingTime"]');
+                
+                const timer = setInterval(() => {
+                    remainingTime--;
+                    if (timeSpan) timeSpan.textContent = remainingTime;
+                    
+                    if (remainingTime <= 0) {
+                        clearInterval(timer);
+                        notificationTakeover.classList.add('hidden');
+                    }
+                }, 1000);
+            }
+
+            // Close notification
+            const closeNotificationBtns = document.querySelectorAll('[data-event*="closeNotification"]');
+            closeNotificationBtns.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    notificationTakeover.classList.add('hidden');
+                });
+            });
+
+            // TODO: Implement Socket.IO connection for real-time updates
+            // TODO: Implement authentication system
+            // TODO: Connect to backend API endpoints
+            // TODO: Add proper error handling and validation
+            // TODO: Implement confetti animation library
+            // TODO: Add audio playback functionality
+        })();
+    </script>
+</body>
+</html>

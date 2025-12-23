@@ -1,0 +1,228 @@
+here’s a single, copy-paste prompt you can drop into Replit AI to scaffold the whole app exactly as we discussed:
+
+---
+
+**Title:**
+Build a Real-Time Sales Leaderboard (MERN + Socket.IO) with Activation Popups & Takeover Notifications
+
+**Goal:**
+Create a production-ready MERN webapp that shows **teams as cards** (one TL per team) with **agents inside each card** sorted by **activation %**. Leaderboard reorders **in real time** when TL updates submissions/activations/points. On each **activation**, show a **celebration popup card** with agent photo, confetti, and a sound (mute toggle). **Admin** can push **text/image/video/audio notifications** that **take over the screen** until dismissed or timed out. Provide a **public TV view** with **no auth** showing the leaderboard + popups. **Credentials for Admin/TL are hardcoded in `.env`**.
+
+---
+
+### Tech Stack
+
+* **Frontend:** React + Vite, TailwindCSS, React Router, Socket.IO client
+* **Backend:** Node.js, Express, MongoDB (Mongoose), Socket.IO
+* **Auth:** Email + password (for Admin & TL) via JWT; credentials from `.env` (demo)
+* **Realtime:** Socket.IO rooms (`leaderboard`, `team:<teamId>`, `admin`)
+* **Media:** Notification supports URLs for images/videos/audio
+* **Deploy:** Single repo with `/server` + `/client`; dev scripts to run both
+
+---
+
+### Roles & Access
+
+* **Admin:** manage TL accounts; view all teams/agents; push notifications; set default popup duration & global sound; (read/write)
+* **Team Leader (TL):** **only** view their agents list and **update** agents’ **submissions**, **activations**, **points** using **+ / −** buttons; cannot add/delete agents
+* **Agent:** read-only (view)
+* **Public (TV mode):** open, no login; read-only leaderboard with popups and notifications
+
+---
+
+### Core Logic & Ranking
+
+* **One TL = one Team**; all agents created by that TL belong to that team
+* **Agent progress % = (activations / activationTarget) × 100**
+* **Team rank = average activation %** across its agents
+* In each team card, **agents sorted by activation %**
+* TL dashboard updates propagate instantly via Socket.IO, recalculating agent order and team average (and reranking teams)
+
+---
+
+### Events (Socket.IO)
+
+Server → Client:
+
+* `leaderboard:update` → { teams, teamCards, computedRanks }
+* `sale:activation` → { agentId, agentName, photoUrl, teamId, newActivationCount, timestamp } (triggers popup, confetti, sound)
+* `notification:active` → { type, title?, message?, mediaUrl?, duration }
+* `notification:clear` → {}
+
+Client → Server:
+
+* `tl:updateCounters` → { agentId, delta: { submissions?, activations?, points? } }
+* `admin:pushNotification` → { type: 'text'|'image'|'video'|'audio', title?, message?, mediaUrl?, duration? }
+* (auth required for TL/Admin events)
+
+---
+
+### API (Express) — minimal and scoped
+
+* `/auth/login` (Admin, TL via `.env` creds), `/auth/me`
+* `/stats/leaderboard` GET → computed ranks, top stats, team cards
+* `/tl/agents` GET (own team list)
+* `/tl/agents/:id/increment` PATCH → body: `{ submissions?: +1|-1, activations?: +1|-1, points?: +1|-1 }`
+* `/admin/notifications` POST → push takeover notification; PATCH `/admin/notifications/clear`
+* (Optional) `/admin/tls` CRUD in DB (but initial demo uses `.env` creds)
+
+---
+
+### Data Models (Mongoose)
+
+**User** (Admin, TL)
+
+```js
+{ name:String, email:String, passwordHash:String, role:{type:String, enum:['admin','tl']}, teamId:String, avatarUrl:String }
+```
+
+**Team**
+
+```js
+{ name:String, tlId:String, agents:[ObjectId], avgActivation:Number, totalActivations:Number, totalSubmissions:Number }
+```
+
+**Agent**
+
+```js
+{ name:String, photoUrl:String, teamId:ObjectId, activationTarget:Number, activations:Number, submissions:Number, points:Number }
+```
+
+**Notification**
+
+```js
+{ type:{type:String, enum:['text','image','video','audio']}, title:String, message:String, mediaUrl:String, isActive:Boolean, duration:Number, createdAt:Date }
+```
+
+---
+
+### Frontend Pages & Components
+
+* **/leaderboard** (Public/TV mode toggle)
+
+  * **Top Stats bar** (auto-refresh via sockets):
+
+    * 🏆 Top Agent of the Month → name, photo, total activations (this month)
+    * ⚡ Top Agent Today (Submissions) → name, photo, submissions today
+    * 🔄 Total Activations (all teams)
+    * 📝 Total Submissions (all teams)
+  * **TeamCard** (grid):
+
+    * Team name, TL name & photo
+    * Total activations, total submissions
+    * Average activation %
+    * Agent list rows: photo, name, activations, submissions, activation %
+* **/tl** (TL Dashboard: simple)
+
+  * Table of agents in TL’s team with **+ / −** buttons for **submissions**, **activations**, **points**
+  * Values update instantly; emits socket to refresh leaderboard
+* **/admin**
+
+  * Push **Takeover Notifications** (type, message/mediaUrl, duration with default)
+  * Toggle global sound on/off, set default popup duration (used by popup unless overridden)
+  * (Optional later: manage TLs)
+* **Components:** `TeamCard`, `AgentRow`, `TopStats`, `CelebrationPopup` (confetti + sound + mute toggle; duration uses admin default), `NotificationTakeover` (full screen with media/text), `AudioToggle`
+
+---
+
+### Celebration Popup (Activation-only)
+
+* Triggers **only when an activation is added**
+* Shows agent **photo + name** and new activation count
+* **Confetti** animation; **sound** plays (HTMLAudioElement); **Mute/Unmute** toggle stored locally
+* **Duration** = Admin default (configurable)
+
+---
+
+### Takeover Notifications
+
+* Admin can push **text/image/video/audio**; leaderboard **replaced full-screen** until:
+
+  * duration elapses (default applied if none)
+  * or Admin clears manually
+* Clients receive `notification:active` then `notification:clear`
+
+---
+
+### Security & Validation
+
+* JWT auth for Admin/TL routes; public leaderboard has no auth
+* Hardcoded demo credentials in `.env`; on login, compare against env and issue JWT
+* Input validation with simple middleware (e.g., Zod/Joi or manual checks)
+* Rate-limit TL increment endpoint
+
+---
+
+### Project Structure
+
+```
+/server
+  server.js
+  /models (User.js, Team.js, Agent.js, Notification.js)
+  /routes (auth.js, tl.js, admin.js, stats.js)
+  /controllers
+  /sockets (index.js)
+  /utils (computeLeaderboard.js, topStats.js)
+  /middleware (auth.js, roles.js, validate.js)
+  seed.js
+/client
+  index.html
+  /src
+    main.jsx
+    App.jsx
+    /pages (Leaderboard.jsx, TLPanel.jsx, AdminDashboard.jsx, Login.jsx)
+    /components (TopStats.jsx, TeamCard.jsx, AgentRow.jsx, CelebrationPopup.jsx, NotificationTakeover.jsx, AudioToggle.jsx)
+    /store (simple Zustand/RTK slices for user, leaderboard, notification, audio)
+  tailwind.config.js
+```
+
+---
+
+### Dev & Scripts
+
+* Root `npm run dev` → concurrently runs server & client
+* Server hot reload via `nodemon`
+* Socket reconnect/backoff; on reconnect, refetch `/stats/leaderboard`
+
+---
+
+### `.env.sample`
+
+```
+# Demo auth (server)
+ADMIN_EMAIL=admin@example.com
+ADMIN_PASSWORD=admin123
+TL_EMAIL=tl@example.com
+TL_PASSWORD=tl123
+
+# JWT & DB
+JWT_SECRET=supersecret
+MONGODB_URI=mongodb://127.0.0.1:27017/sales_leaderboard
+
+# Defaults
+DEFAULT_POPUP_DURATION_MS=5000
+DEFAULT_NOTIFICATION_DURATION_MS=15000
+```
+
+---
+
+### Seeding (for instant demo)
+
+* Create 2 TLs (Team Alpha, Team Bravo), each with 3–4 agents
+* Set agent **activationTarget** varied (e.g., 10, 15, 20) to show % differences
+* Random submissions/activations so ranks differ
+* One sample **image** notification and one **audio** notification (use public URLs)
+* 2–3 **celebration** MP3s in `/client/public/sfx/{celebrate1.mp3, celebrate2.mp3}`
+
+---
+
+### Acceptance Criteria
+
+* TL taps **+** activation → **popup + confetti + sound**; leaderboard and team/agent ordering **update immediately**
+* Top Stats bar updates live (today’s submissions, totals, top agent month)
+* Admin pushes a notification → leaderboard switches to **full-screen takeover** and restores after timeout/clear
+* Public TV view loads without login and reflects all realtime events
+
+---
+
+**Build all code, wiring, and UI now. Include README with setup steps, `.env.sample`, and seed script.**
