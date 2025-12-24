@@ -3,7 +3,10 @@ import { fileURLToPath } from "url";
 
 import express, { type Request, type Response, type NextFunction } from "express";
 import { registerRoutes } from "./routes";
-import { setupVite, serveStatic, log } from "./vite";
+import { log } from "./utils/log";
+
+import fs from "fs";
+
 import { seedData } from "./seed";
 import { storage } from "./storage";
 import { connectToMongoDB } from "./db/connection";
@@ -60,14 +63,27 @@ function scheduleDailyReset() {
 }
 
 (async () => {
-  await connectToMongoDB();
-  await seedData();
+  let dbConnected = false;
+  try {
+    await connectToMongoDB();
+    dbConnected = true;
+    await seedData();
+  } catch (err) {
+    console.error("⚠️ Failed to connect to DB or seed data, but starting server anyway:", err);
+  }
 
-  log("🔄 Checking for montly submission reset...");
-  await storage.resetDailySubmissions();
-  log("✅ montly submission reset check completed");
+  if (dbConnected) {
+    try {
+      log("🔄 Checking for montly submission reset...");
+      await storage.resetDailySubmissions();
+      log("✅ montly submission reset check completed");
+    } catch (err) {
+      console.error("⚠️ Failed to reset daily submissions:", err);
+    }
+  }
 
   scheduleDailyReset();
+
 
   const server = await registerRoutes(app);
 
@@ -78,15 +94,27 @@ function scheduleDailyReset() {
     throw err;
   });
 
-  if (app.get("env") === "development") {
-    await setupVite(app, server);
-  } else {
-    // pass safe base dir for prod static
-    serveStatic(app, __dirname);
+  // In a microservice-like setup, we don't serve the frontend from the same process in dev.
+  // The frontend runs its own Vite server and proxies requests here.
+  if (app.get("env") === "production") {
+    // In production, we can still serve the static files if desired,
+    // but typically a microservice setup might have a separate CDN/web server.
+    // For now, let's keep the option to serve static files from dist/public.
+    const distPath = path.resolve(__dirname, "..", "dist", "public");
+    if (fs.existsSync(distPath)) {
+
+      app.use(express.static(distPath));
+      app.get("*", (_req, res) => {
+        res.sendFile(path.join(distPath, "index.html"));
+      });
+    }
   }
 
-  const port = parseInt(process.env.PORT || "5000", 10);
-  server.listen({ port, host: "0.0.0.0" }, () => {
+
+  const port = parseInt(process.env.PORT || "5002", 10);
+
+
+  server.listen(port, "0.0.0.0", () => {
     log(`🚀 Sales Leaderboard server running on port ${port}`);
     log(`📊 Dashboard: http://localhost:${port}`);
     log(`🔐 Admin: admin@example.com / admin123`);

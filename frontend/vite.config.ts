@@ -17,20 +17,38 @@ export default defineConfig({
   ],
   resolve: {
     alias: {
-      "@": path.resolve(__dirname, "client", "src"),
+      "@": path.resolve(__dirname, "src"),
       "@shared": path.resolve(__dirname, "shared"),
-      "@assets": path.resolve(__dirname, "attached_assets")
+      "@assets": path.resolve(__dirname, "..", "backend", "attached_assets")
     }
   },
-  root: path.resolve(__dirname, "client"),
+  root: __dirname,
   build: {
-    outDir: path.resolve(__dirname, "dist/public"),
+    outDir: path.resolve(__dirname, "..", "dist/public"),
     emptyOutDir: true
   },
   server: {
+    proxy: {
+      "/api": {
+        target: "http://localhost:5002",
+        changeOrigin: true,
+      },
+      "/uploads": {
+        target: "http://localhost:5002",
+        changeOrigin: true,
+      },
+      "/ws": {
+        target: "http://localhost:5002",
+        ws: true,
+      },
+
+
+    },
+
     fs: {
       strict: true,
       deny: ["**/.*"]
     }
   }
 });
+

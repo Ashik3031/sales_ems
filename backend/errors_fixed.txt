@@ -1,0 +1,42 @@
+middleware/auth.ts(42,18): error TS2339: Property 'role' does not exist on type 'User'.
+middleware/auth.ts(42,44): error TS2339: Property 'role' does not exist on type 'User'.
+middleware/auth.ts(55,42): error TS2339: Property 'role' does not exist on type 'User'.
+routes.ts(282,62): error TS2339: Property 'id' does not exist on type 'User'.
+routes.ts(376,23): error TS2339: Property 'id' does not exist on type 'User'.
+routes.ts(377,25): error TS2339: Property 'name' does not exist on type 'User'.
+routes.ts(378,26): error TS2339: Property 'email' does not exist on type 'User'.
+routes.ts(379,25): error TS2339: Property 'role' does not exist on type 'User'.
+routes.ts(380,27): error TS2339: Property 'teamId' does not exist on type 'User'.
+routes.ts(381,30): error TS2339: Property 'avatarUrl' does not exist on type 'User'.
+routes.ts(408,23): error TS2339: Property 'role' does not exist on type 'User'.
+routes.ts(412,62): error TS2339: Property 'id' does not exist on type 'User'.
+routes.ts(442,23): error TS2339: Property 'role' does not exist on type 'User'.
+routes.ts(443,62): error TS2339: Property 'id' does not exist on type 'User'.
+routes.ts(533,23): error TS2339: Property 'role' does not exist on type 'User'.
+routes.ts(534,62): error TS2339: Property 'id' does not exist on type 'User'.
+routes.ts(569,18): error TS2339: Property 'role' does not exist on type 'User'.
+routes.ts(570,51): error TS2339: Property 'id' does not exist on type 'User'.
+routes.ts(580,24): error TS2339: Property 'role' does not exist on type 'User'.
+routes.ts(615,18): error TS2339: Property 'role' does not exist on type 'User'.
+routes.ts(616,57): error TS2339: Property 'id' does not exist on type 'User'.
+routes.ts(877,27): error TS2339: Property 'id' does not exist on type 'User'.
+routes.ts(887,69): error TS2339: Property 'id' does not exist on type 'User'.
+routes.ts(892,56): error TS2339: Property 'id' does not exist on type 'User'.
+routes.ts(932,53): error TS2339: Property 'id' does not exist on type 'User'.
+routes.ts(946,53): error TS2339: Property 'id' does not exist on type 'User'.
+routes.ts(1141,22): error TS2339: Property 'role' does not exist on type 'User'.
+routes.ts(1141,51): error TS2339: Property 'role' does not exist on type 'User'.
+routes.ts(1151,22): error TS2339: Property 'role' does not exist on type 'User'.
+routes.ts(1152,61): error TS2339: Property 'id' does not exist on type 'User'.
+routes.ts(1164,57): error TS2339: Property 'id' does not exist on type 'User'.
+routes.ts(1167,32): error TS2339: Property 'email' does not exist on type 'User'.
+routes.ts(1168,58): error TS2339: Property 'email' does not exist on type 'User'.
+routes.ts(1171,76): error TS2339: Property 'id' does not exist on type 'User'.
+routes.ts(1176,66): error TS2339: Property 'id' does not exist on type 'User'.
+vite.ts(6,10): error TS2305: Module '"vite"' has no exported member 'createServer'.
+vite.ts(6,44): error TS2303: Circular definition of import alias 'createLogger'.
+vite.ts(6,44): error TS2459: Module '"vite"' declares 'createLogger' locally, but it is not exported.
+vite.ts(8,24): error TS6059: File 'C:/Users/user/Desktop/gravity/sales-ems/TSPL-EMS_/frontend/vite.config.ts' is not under 'rootDir' 'C:/Users/user/Desktop/gravity/sales-ems/TSPL-EMS_/backend'. 'rootDir' is expected to contain all source files.
+vite.ts(39,15): error TS7006: Parameter 'msg' implicitly has an 'any' type.
+vite.ts(39,20): error TS7006: Parameter 'options' implicitly has an 'any' type.
+../frontend/vite.config.ts(1,10): error TS2305: Module '"vite"' has no exported member 'defineConfig'.

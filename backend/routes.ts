@@ -10,7 +10,9 @@ import fs from "fs";
 import path from "path";
 import { storage } from "./storage";
 import { authenticate, requireRole, requireTLOrAdmin } from "./middleware/auth";
+import { log } from "./utils/log";
 import { computeLeaderboard } from "./utils/computeLeaderboard";
+
 import { computeTopStats } from "./utils/topStats";
 import {
   loginSchema,
@@ -87,7 +89,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
   const roomClients = new Map<string, Set<WebSocket>>();
 
   wss.on("connection", (ws) => {
+    log("🔌 WebSocket client connected");
     clients.add(ws);
+
 
     ws.on("message", async (data) => {
       try {
@@ -758,21 +762,32 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Public Teams List for Registration
   app.get("/api/teams/list", async (_req, res) => {
     try {
+      console.log("[teams/list] Fetching all teams...");
       const teams = await storage.getAllTeams();
-      // Enhance with TL Name
+      console.log(`[teams/list] Found ${teams.length} teams. Enhancing with TL names...`);
+
       const teamList = await Promise.all(teams.map(async (t) => {
-        const tl = await storage.getUser(t.tlId);
-        return {
-          id: t.id,
-          name: t.name,
-          tlName: tl?.name || 'Unknown TL'
-        };
+        try {
+          const tl = await storage.getUser(t.tlId);
+          return {
+            id: t.id,
+            name: t.name,
+            tlName: tl?.name || 'Unknown TL'
+          };
+        } catch (err) {
+          console.error(`[teams/list] Error fetching TL for team ${t.id}:`, err);
+          return { id: t.id, name: t.name, tlName: 'Error fetching TL' };
+        }
       }));
+
+      console.log("[teams/list] Success.");
       res.json(teamList);
-    } catch (e) {
-      res.status(500).json({ message: "Failed to fetch teams" });
+    } catch (e: any) {
+      console.error("[teams/list] Critical failure:", e);
+      res.status(500).json({ message: "Failed to fetch teams", error: e.message });
     }
   });
+
 
   // Employee Registration
   app.post("/api/auth/register/employee", async (req, res) => {

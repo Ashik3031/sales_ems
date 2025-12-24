@@ -1,0 +1,965 @@
+﻿[dotenv@17.2.3] injecting env (15) from .env -- tip: ΓÜÖ∩╕Å  load multiple .env files with { path: ['.env.local', '.env'] }
+node.exe : Γ¥î 
+MongoDB connection 
+error: MongooseServer
+SelectionError: 
+Could not connect to 
+any servers in your 
+MongoDB Atlas 
+cluster. One common 
+reason is that 
+you're trying to 
+access the database 
+from an IP that 
+isn't whitelisted. 
+Make sure your 
+current IP address 
+is on your Atlas 
+cluster's IP 
+whitelist: https://ww
+w.mongodb.com/docs/at
+las/security-whitelis
+t/
+At C:\Program Files\n
+odejs\npx.ps1:29 
+char:3
++   & $NODE_EXE 
+$NPX_CLI_JS $args
++   ~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~
+    + CategoryInfo   
+           : NotSpe  
+  cified: (Γ¥î Mon   
+ goDB con...rity-    
+whitelist/:Strin    
+g) [], RemoteExc    
+eption
+    + FullyQualified 
+   ErrorId : Native  
+  CommandError
+ 
+    at _handleConnect
+ionErrors (C:\Users\u
+ser\Desktop\gravity\s
+ales-ems\TSPL-EMS_\no
+de_modules\mongoose\l
+ib\connection.js:1165
+:11)
+    at NativeConnecti
+on.openUri (C:\Users\
+user\Desktop\gravity\
+sales-ems\TSPL-EMS_\n
+ode_modules\mongoose\
+lib\connection.js:109
+6:11)
+    at async 
+connectToMongoDB (C:\
+Users\user\Desktop\gr
+avity\sales-ems\TSPL-
+EMS_\backend\db\conne
+ction.ts:44:5)
+    at async 
+<anonymous> (C:\Users
+\user\Desktop\gravity
+\sales-ems\TSPL-EMS_\
+backend\index.ts:66:3
+) {
+  errorLabelSet: 
+Set(0) {},
+  reason: 
+TopologyDescription {
+    type: 'ReplicaSet
+NoPrimary',
+    servers: Map(3) {
+      'ac-bfkymgk-sha
+rd-00-00.fc2snot.mong
+odb.net:27017' => 
+[ServerDescription],
+      'ac-bfkymgk-sha
+rd-00-01.fc2snot.mong
+odb.net:27017' => 
+[ServerDescription],
+      'ac-bfkymgk-sha
+rd-00-02.fc2snot.mong
+odb.net:27017' => 
+[ServerDescription]
+    },
+    stale: false,
+    compatible: true,
+    heartbeatFrequenc
+yMS: 10000,
+    
+localThresholdMS: 15,
+    setName: 'atlas-l
+uaxjk-shard-0',
+    maxElectionId: 
+null,
+    maxSetVersion: 
+null,
+    
+commonWireVersion: 0,
+    logicalSessionTim
+eoutMinutes: null
+  },
+  code: undefined,
+  cause: 
+TopologyDescription {
+    type: 'ReplicaSet
+NoPrimary',
+    servers: Map(3) {
+      'ac-bfkymgk-sha
+rd-00-00.fc2snot.mong
+odb.net:27017' => 
+[ServerDescription],
+      'ac-bfkymgk-sha
+rd-00-01.fc2snot.mong
+odb.net:27017' => 
+[ServerDescription],
+      'ac-bfkymgk-sha
+rd-00-02.fc2snot.mong
+odb.net:27017' => 
+[ServerDescription]
+    },
+    stale: false,
+    compatible: true,
+    heartbeatFrequenc
+yMS: 10000,
+    
+localThresholdMS: 15,
+    setName: 'atlas-l
+uaxjk-shard-0',
+    maxElectionId: 
+null,
+    maxSetVersion: 
+null,
+    
+commonWireVersion: 0,
+    logicalSessionTim
+eoutMinutes: null
+  }
+}
+node:internal/process
+/promises:394
+    triggerUncaughtEx
+ception(err, true /* 
+fromPromise */);
+    ^
+
+MongooseServerSelecti
+onError: Could not 
+connect to any 
+servers in your 
+MongoDB Atlas 
+cluster. One common 
+reason is that 
+you're trying to 
+access the database 
+from an IP that 
+isn't whitelisted. 
+Make sure your 
+current IP address 
+is on your Atlas 
+cluster's IP 
+whitelist: https://ww
+w.mongodb.com/docs/at
+las/security-whitelis
+t/
+    at _handleConnect
+ionErrors (C:\Users\u
+ser\Desktop\gravity\s
+ales-ems\TSPL-EMS_\no
+de_modules\mongoose\l
+ib\connection.js:1165
+:11)
+    at NativeConnecti
+on.openUri (C:\Users\
+user\Desktop\gravity\
+sales-ems\TSPL-EMS_\n
+ode_modules\mongoose\
+lib\connection.js:109
+6:11)
+    at async 
+connectToMongoDB (C:\
+Users\user\Desktop\gr
+avity\sales-ems\TSPL-
+EMS_\backend\db\conne
+ction.ts:44:5)
+    at async 
+<anonymous> (C:\Users
+\user\Desktop\gravity
+\sales-ems\TSPL-EMS_\
+backend\index.ts:66:3
+) {
+  errorLabelSet: 
+Set(0) {},
+  reason: 
+TopologyDescription {
+    type: 'ReplicaSet
+NoPrimary',
+    servers: Map(3) {
+      'ac-bfkymgk-sha
+rd-00-00.fc2snot.mong
+odb.net:27017' => 
+ServerDescription {
+        address: 'ac-
+bfkymgk-shard-00-00.f
+c2snot.mongodb.net:27
+017',
+        type: 
+'Unknown',
+        hosts: [],
+        passives: [],
+        arbiters: [],
+        tags: {},
+        
+minWireVersion: 0,
+        
+maxWireVersion: 0,
+        
+roundTripTime: -1,
+        
+minRoundTripTime: 0,
+        
+lastUpdateTime: 
+454327157,
+        
+lastWriteDate: 0,
+        error: 
+MongoNetworkError: 84
+320000:error:0A000438
+:SSL routines:ssl3_re
+ad_bytes:tlsv1 alert 
+internal error:c:\ws\
+deps\openssl\openssl\
+ssl\record\rec_layer_
+s3.c:1605:SSL alert 
+number 80
+        
+            at TLSSoc
+ket.<anonymous> (C:\U
+sers\user\Desktop\gra
+vity\sales-ems\TSPL-E
+MS_\node_modules\mong
+odb\src\cmap\connect.
+ts:395:16)
+            at 
+Object.onceWrapper 
+(node:events:633:26)
+            at 
+TLSSocket.emit 
+(node:events:518:28)
+            at 
+emitErrorNT (node:int
+ernal/streams/destroy
+:170:8)
+            at 
+emitErrorCloseNT (nod
+e:internal/streams/de
+stroy:129:3)
+            at proces
+s.processTicksAndReje
+ctions (node:internal
+/process/task_queues:
+90:21) {
+          
+errorLabelSet: 
+Set(1) { 'ResetPool' 
+},
+          
+beforeHandshake: 
+false,
+          [cause]: 
+[Error: 84320000:erro
+r:0A000438:SSL routin
+es:ssl3_read_bytes:tl
+sv1 alert internal er
+ror:c:\ws\deps\openss
+l\openssl\ssl\record\
+rec_layer_s3.c:1605:S
+SL alert number 80
+          ] {
+            library: 
+'SSL routines',
+            reason: 
+'tlsv1 alert 
+internal error',
+            code: 'ER
+R_SSL_TLSV1_ALERT_INT
+ERNAL_ERROR'
+          }
+        },
+        
+topologyVersion: 
+null,
+        setName: 
+null,
+        setVersion: 
+null,
+        electionId: 
+null,
+        logicalSessio
+nTimeoutMinutes: 
+null,
+        
+maxMessageSizeBytes: 
+null,
+        
+maxWriteBatchSize: 
+null,
+        
+maxBsonObjectSize: 
+null,
+        primary: 
+null,
+        me: null,
+        
+'$clusterTime': null,
+        iscryptd: 
+false
+      },
+      'ac-bfkymgk-sha
+rd-00-01.fc2snot.mong
+odb.net:27017' => 
+ServerDescription {
+        address: 'ac-
+bfkymgk-shard-00-01.f
+c2snot.mongodb.net:27
+017',
+        type: 
+'Unknown',
+        hosts: [],
+        passives: [],
+        arbiters: [],
+        tags: {},
+        
+minWireVersion: 0,
+        
+maxWireVersion: 0,
+        
+roundTripTime: -1,
+        
+minRoundTripTime: 0,
+        
+lastUpdateTime: 
+454327158,
+        
+lastWriteDate: 0,
+        error: 
+MongoNetworkError: 84
+320000:error:0A000438
+:SSL routines:ssl3_re
+ad_bytes:tlsv1 alert 
+internal error:c:\ws\
+deps\openssl\openssl\
+ssl\record\rec_layer_
+s3.c:1605:SSL alert 
+number 80
+        
+            at TLSSoc
+ket.<anonymous> (C:\U
+sers\user\Desktop\gra
+vity\sales-ems\TSPL-E
+MS_\node_modules\mong
+odb\src\cmap\connect.
+ts:395:16)
+            at 
+Object.onceWrapper 
+(node:events:633:26)
+            at 
+TLSSocket.emit 
+(node:events:518:28)
+            at 
+emitErrorNT (node:int
+ernal/streams/destroy
+:170:8)
+            at 
+emitErrorCloseNT (nod
+e:internal/streams/de
+stroy:129:3)
+            at proces
+s.processTicksAndReje
+ctions (node:internal
+/process/task_queues:
+90:21) {
+          
+errorLabelSet: 
+Set(1) { 'ResetPool' 
+},
+          
+beforeHandshake: 
+false,
+          [cause]: 
+[Error: 84320000:erro
+r:0A000438:SSL routin
+es:ssl3_read_bytes:tl
+sv1 alert internal er
+ror:c:\ws\deps\openss
+l\openssl\ssl\record\
+rec_layer_s3.c:1605:S
+SL alert number 80
+          ] {
+            library: 
+'SSL routines',
+            reason: 
+'tlsv1 alert 
+internal error',
+            code: 'ER
+R_SSL_TLSV1_ALERT_INT
+ERNAL_ERROR'
+          }
+        },
+        
+topologyVersion: 
+null,
+        setName: 
+null,
+        setVersion: 
+null,
+        electionId: 
+null,
+        logicalSessio
+nTimeoutMinutes: 
+null,
+        
+maxMessageSizeBytes: 
+null,
+        
+maxWriteBatchSize: 
+null,
+        
+maxBsonObjectSize: 
+null,
+        primary: 
+null,
+        me: null,
+        
+'$clusterTime': null,
+        iscryptd: 
+false
+      },
+      'ac-bfkymgk-sha
+rd-00-02.fc2snot.mong
+odb.net:27017' => 
+ServerDescription {
+        address: 'ac-
+bfkymgk-shard-00-02.f
+c2snot.mongodb.net:27
+017',
+        type: 
+'Unknown',
+        hosts: [],
+        passives: [],
+        arbiters: [],
+        tags: {},
+        
+minWireVersion: 0,
+        
+maxWireVersion: 0,
+        
+roundTripTime: -1,
+        
+minRoundTripTime: 0,
+        
+lastUpdateTime: 
+454327398,
+        
+lastWriteDate: 0,
+        error: 
+MongoNetworkError: 84
+320000:error:0A000438
+:SSL routines:ssl3_re
+ad_bytes:tlsv1 alert 
+internal error:c:\ws\
+deps\openssl\openssl\
+ssl\record\rec_layer_
+s3.c:1605:SSL alert 
+number 80
+        
+            at TLSSoc
+ket.<anonymous> (C:\U
+sers\user\Desktop\gra
+vity\sales-ems\TSPL-E
+MS_\node_modules\mong
+odb\src\cmap\connect.
+ts:395:16)
+            at 
+Object.onceWrapper 
+(node:events:633:26)
+            at 
+TLSSocket.emit 
+(node:events:518:28)
+            at 
+emitErrorNT (node:int
+ernal/streams/destroy
+:170:8)
+            at 
+emitErrorCloseNT (nod
+e:internal/streams/de
+stroy:129:3)
+            at proces
+s.processTicksAndReje
+ctions (node:internal
+/process/task_queues:
+90:21) {
+          
+errorLabelSet: 
+Set(1) { 'ResetPool' 
+},
+          
+beforeHandshake: 
+false,
+          [cause]: 
+[Error: 84320000:erro
+r:0A000438:SSL routin
+es:ssl3_read_bytes:tl
+sv1 alert internal er
+ror:c:\ws\deps\openss
+l\openssl\ssl\record\
+rec_layer_s3.c:1605:S
+SL alert number 80
+          ] {
+            library: 
+'SSL routines',
+            reason: 
+'tlsv1 alert 
+internal error',
+            code: 'ER
+R_SSL_TLSV1_ALERT_INT
+ERNAL_ERROR'
+          }
+        },
+        
+topologyVersion: 
+null,
+        setName: 
+null,
+        setVersion: 
+null,
+        electionId: 
+null,
+        logicalSessio
+nTimeoutMinutes: 
+null,
+        
+maxMessageSizeBytes: 
+null,
+        
+maxWriteBatchSize: 
+null,
+        
+maxBsonObjectSize: 
+null,
+        primary: 
+null,
+        me: null,
+        
+'$clusterTime': null,
+        iscryptd: 
+false
+      }
+    },
+    stale: false,
+    compatible: true,
+    heartbeatFrequenc
+yMS: 10000,
+    
+localThresholdMS: 15,
+    setName: 'atlas-l
+uaxjk-shard-0',
+    maxElectionId: 
+null,
+    maxSetVersion: 
+null,
+    
+commonWireVersion: 0,
+    logicalSessionTim
+eoutMinutes: null
+  },
+  code: undefined,
+  cause: 
+TopologyDescription {
+    type: 'ReplicaSet
+NoPrimary',
+    servers: Map(3) {
+      'ac-bfkymgk-sha
+rd-00-00.fc2snot.mong
+odb.net:27017' => 
+ServerDescription {
+        address: 'ac-
+bfkymgk-shard-00-00.f
+c2snot.mongodb.net:27
+017',
+        type: 
+'Unknown',
+        hosts: [],
+        passives: [],
+        arbiters: [],
+        tags: {},
+        
+minWireVersion: 0,
+        
+maxWireVersion: 0,
+        
+roundTripTime: -1,
+        
+minRoundTripTime: 0,
+        
+lastUpdateTime: 
+454327157,
+        
+lastWriteDate: 0,
+        error: 
+MongoNetworkError: 84
+320000:error:0A000438
+:SSL routines:ssl3_re
+ad_bytes:tlsv1 alert 
+internal error:c:\ws\
+deps\openssl\openssl\
+ssl\record\rec_layer_
+s3.c:1605:SSL alert 
+number 80
+        
+            at TLSSoc
+ket.<anonymous> (C:\U
+sers\user\Desktop\gra
+vity\sales-ems\TSPL-E
+MS_\node_modules\mong
+odb\src\cmap\connect.
+ts:395:16)
+            at 
+Object.onceWrapper 
+(node:events:633:26)
+            at 
+TLSSocket.emit 
+(node:events:518:28)
+            at 
+emitErrorNT (node:int
+ernal/streams/destroy
+:170:8)
+            at 
+emitErrorCloseNT (nod
+e:internal/streams/de
+stroy:129:3)
+            at proces
+s.processTicksAndReje
+ctions (node:internal
+/process/task_queues:
+90:21) {
+          
+errorLabelSet: 
+Set(1) { 'ResetPool' 
+},
+          
+beforeHandshake: 
+false,
+          [cause]: 
+[Error: 84320000:erro
+r:0A000438:SSL routin
+es:ssl3_read_bytes:tl
+sv1 alert internal er
+ror:c:\ws\deps\openss
+l\openssl\ssl\record\
+rec_layer_s3.c:1605:S
+SL alert number 80
+          ] {
+            library: 
+'SSL routines',
+            reason: 
+'tlsv1 alert 
+internal error',
+            code: 'ER
+R_SSL_TLSV1_ALERT_INT
+ERNAL_ERROR'
+          }
+        },
+        
+topologyVersion: 
+null,
+        setName: 
+null,
+        setVersion: 
+null,
+        electionId: 
+null,
+        logicalSessio
+nTimeoutMinutes: 
+null,
+        
+maxMessageSizeBytes: 
+null,
+        
+maxWriteBatchSize: 
+null,
+        
+maxBsonObjectSize: 
+null,
+        primary: 
+null,
+        me: null,
+        
+'$clusterTime': null,
+        iscryptd: 
+false
+      },
+      'ac-bfkymgk-sha
+rd-00-01.fc2snot.mong
+odb.net:27017' => 
+ServerDescription {
+        address: 'ac-
+bfkymgk-shard-00-01.f
+c2snot.mongodb.net:27
+017',
+        type: 
+'Unknown',
+        hosts: [],
+        passives: [],
+        arbiters: [],
+        tags: {},
+        
+minWireVersion: 0,
+        
+maxWireVersion: 0,
+        
+roundTripTime: -1,
+        
+minRoundTripTime: 0,
+        
+lastUpdateTime: 
+454327158,
+        
+lastWriteDate: 0,
+        error: 
+MongoNetworkError: 84
+320000:error:0A000438
+:SSL routines:ssl3_re
+ad_bytes:tlsv1 alert 
+internal error:c:\ws\
+deps\openssl\openssl\
+ssl\record\rec_layer_
+s3.c:1605:SSL alert 
+number 80
+        
+            at TLSSoc
+ket.<anonymous> (C:\U
+sers\user\Desktop\gra
+vity\sales-ems\TSPL-E
+MS_\node_modules\mong
+odb\src\cmap\connect.
+ts:395:16)
+            at 
+Object.onceWrapper 
+(node:events:633:26)
+            at 
+TLSSocket.emit 
+(node:events:518:28)
+            at 
+emitErrorNT (node:int
+ernal/streams/destroy
+:170:8)
+            at 
+emitErrorCloseNT (nod
+e:internal/streams/de
+stroy:129:3)
+            at proces
+s.processTicksAndReje
+ctions (node:internal
+/process/task_queues:
+90:21) {
+          
+errorLabelSet: 
+Set(1) { 'ResetPool' 
+},
+          
+beforeHandshake: 
+false,
+          [cause]: 
+[Error: 84320000:erro
+r:0A000438:SSL routin
+es:ssl3_read_bytes:tl
+sv1 alert internal er
+ror:c:\ws\deps\openss
+l\openssl\ssl\record\
+rec_layer_s3.c:1605:S
+SL alert number 80
+          ] {
+            library: 
+'SSL routines',
+            reason: 
+'tlsv1 alert 
+internal error',
+            code: 'ER
+R_SSL_TLSV1_ALERT_INT
+ERNAL_ERROR'
+          }
+        },
+        
+topologyVersion: 
+null,
+        setName: 
+null,
+        setVersion: 
+null,
+        electionId: 
+null,
+        logicalSessio
+nTimeoutMinutes: 
+null,
+        
+maxMessageSizeBytes: 
+null,
+        
+maxWriteBatchSize: 
+null,
+        
+maxBsonObjectSize: 
+null,
+        primary: 
+null,
+        me: null,
+        
+'$clusterTime': null,
+        iscryptd: 
+false
+      },
+      'ac-bfkymgk-sha
+rd-00-02.fc2snot.mong
+odb.net:27017' => 
+ServerDescription {
+        address: 'ac-
+bfkymgk-shard-00-02.f
+c2snot.mongodb.net:27
+017',
+        type: 
+'Unknown',
+        hosts: [],
+        passives: [],
+        arbiters: [],
+        tags: {},
+        
+minWireVersion: 0,
+        
+maxWireVersion: 0,
+        
+roundTripTime: -1,
+        
+minRoundTripTime: 0,
+        
+lastUpdateTime: 
+454327398,
+        
+lastWriteDate: 0,
+        error: 
+MongoNetworkError: 84
+320000:error:0A000438
+:SSL routines:ssl3_re
+ad_bytes:tlsv1 alert 
+internal error:c:\ws\
+deps\openssl\openssl\
+ssl\record\rec_layer_
+s3.c:1605:SSL alert 
+number 80
+        
+            at TLSSoc
+ket.<anonymous> (C:\U
+sers\user\Desktop\gra
+vity\sales-ems\TSPL-E
+MS_\node_modules\mong
+odb\src\cmap\connect.
+ts:395:16)
+            at 
+Object.onceWrapper 
+(node:events:633:26)
+            at 
+TLSSocket.emit 
+(node:events:518:28)
+            at 
+emitErrorNT (node:int
+ernal/streams/destroy
+:170:8)
+            at 
+emitErrorCloseNT (nod
+e:internal/streams/de
+stroy:129:3)
+            at proces
+s.processTicksAndReje
+ctions (node:internal
+/process/task_queues:
+90:21) {
+          
+errorLabelSet: 
+Set(1) { 'ResetPool' 
+},
+          
+beforeHandshake: 
+false,
+          [cause]: 
+[Error: 84320000:erro
+r:0A000438:SSL routin
+es:ssl3_read_bytes:tl
+sv1 alert internal er
+ror:c:\ws\deps\openss
+l\openssl\ssl\record\
+rec_layer_s3.c:1605:S
+SL alert number 80
+          ] {
+            library: 
+'SSL routines',
+            reason: 
+'tlsv1 alert 
+internal error',
+            code: 'ER
+R_SSL_TLSV1_ALERT_INT
+ERNAL_ERROR'
+          }
+        },
+        
+topologyVersion: 
+null,
+        setName: 
+null,
+        setVersion: 
+null,
+        electionId: 
+null,
+        logicalSessio
+nTimeoutMinutes: 
+null,
+        
+maxMessageSizeBytes: 
+null,
+        
+maxWriteBatchSize: 
+null,
+        
+maxBsonObjectSize: 
+null,
+        primary: 
+null,
+        me: null,
+        
+'$clusterTime': null,
+        iscryptd: 
+false
+      }
+    },
+    stale: false,
+    compatible: true,
+    heartbeatFrequenc
+yMS: 10000,
+    
+localThresholdMS: 15,
+    setName: 'atlas-l
+uaxjk-shard-0',
+    maxElectionId: 
+null,
+    maxSetVersion: 
+null,
+    
+commonWireVersion: 0,
+    logicalSessionTim
+eoutMinutes: null
+  }
+}
+
+Node.js v22.17.0
+Failed running 'index.ts'. Waiting for file changes before restarting...

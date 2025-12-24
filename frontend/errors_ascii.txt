@@ -1,0 +1,1 @@
+src/pages/Leaderboard.tsx(79,17): error TS2741: Property 'totalTodaySubmissions' is missing in type 'TopStats' but required in type '{ topAgentMonth: { name: string; photoUrl: string; activations: number; }; topAgentToday: { name: string; photoUrl: string; todaySubmissions: number; }; totalActivations: number; totalSubmissions: number; totalTodaySubmissions: number; }'.

@@ -34,11 +34,13 @@ interface TopStats {
   topAgentToday: {
     name: string;
     photoUrl: string;
-    submissions: number;
+    todaySubmissions: number;
   };
   totalActivations: number;
   totalSubmissions: number;
+  totalTodaySubmissions: number;
 }
+
 
 interface LeaderboardState {
   teams: TeamWithAgents[];
@@ -61,7 +63,7 @@ export const useLeaderboardStore = create<LeaderboardState>((set, get) => ({
   setLoading: (isLoading) => set({ isLoading }),
   updateFromSocket: (data) => {
     if (data.teams) {
-      set({ 
+      set({
         teams: data.teams,
         lastUpdated: new Date()
       });

@@ -46,9 +46,11 @@ export async function connectToMongoDB(): Promise<void> {
   } catch (error) {
     globalThis.__mongoConnectPromise = null;
     console.error("❌ MongoDB connection error:", error);
-    throw error;
+    // Don't throw immediately, let the caller decide
+    // throw error; 
   }
 }
+
 
 export async function disconnectFromMongoDB(): Promise<void> {
   // If currently connecting, wait first to avoid race conditions

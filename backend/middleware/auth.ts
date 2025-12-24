@@ -1,27 +1,26 @@
 import { Request, Response, NextFunction } from 'express';
 import jwt from 'jsonwebtoken';
 import { storage } from '../storage';
-import { User } from '@shared/schema';
+import { User as SchemaUser } from '@shared/schema';
 
 declare global {
   namespace Express {
-    interface Request {
-      user?: User;
-    }
+    interface User extends SchemaUser { }
   }
 }
+
 
 export const authenticate = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const token = req.headers.authorization?.replace('Bearer ', '');
-    
+
     if (!token) {
       return res.status(401).json({ message: 'No token provided' });
     }
 
     const decoded = jwt.verify(token, process.env.JWT_SECRET || 'supersecret') as { userId: string };
     const user = await storage.getUser(decoded.userId);
-    
+
     if (!user) {
       return res.status(401).json({ message: 'Invalid token' });
     }
