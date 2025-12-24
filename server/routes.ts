@@ -149,8 +149,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
               // 🎉 Celebration on submission increment
               if (delta.submissions > 0) {
-                // Fetch team to get custom music
-                const agentTeam = await storage.getTeam(agent.teamId);
+                // Fetch team to get custom music (guard if agent has a team)
+                const agentTeam = agent.teamId ? await storage.getTeam(agent.teamId) : undefined;
 
                 broadcastToAll({
                   type: "sale:activation", // keep same event name for frontend
@@ -468,8 +468,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
           // 🎉 Celebration on submission increment
           if (delta.submissions > 0) {
-            // Fetch team to get custom music
-            const agentTeam = await storage.getTeam(agent.teamId);
+            // Fetch team to get custom music (guard if agent has a team)
+            const agentTeam = agent.teamId ? await storage.getTeam(agent.teamId) : undefined;
 
             broadcastToAll({
               type: "sale:activation", // keep same event name for frontend
@@ -811,12 +811,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
           if (agent) {
             // Link existing agent to the newly created user and ensure teamId is set
-            agent = await storage.updateAgent(agent.id, { userId: user.id, teamId: user.teamId });
-
-            // Ensure team also references this agent ID
+            const updatedAgent = await storage.updateAgent(agent.id, { userId: user.id, teamId: user.teamId });
             const team = await storage.getTeam(user.teamId);
-            if (team && !team.agents.includes(agent.id)) {
-              await storage.updateTeam(team.id, { agents: [...team.agents, agent.id] });
+            if (team && updatedAgent && !team.agents.includes(updatedAgent.id)) {
+              await storage.updateTeam(team.id, { agents: [...team.agents, updatedAgent.id] });
             }
           } else {
             // Create a new Agent for this user
@@ -1064,7 +1062,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         const leaderboardData = await computeLeaderboard();
         broadcastToAll({ type: 'leaderboard:update', data: leaderboardData });
       } catch (e) {
-        console.warn('Failed to recompute leaderboard after settings update:', e?.message || e);
+        console.warn('Failed to recompute leaderboard after settings update:', (e as any)?.message || e);
       }
 
       res.json(settings);
@@ -1112,14 +1110,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
         const settings = await storage.getSystemSettings();
         broadcastToAll({ type: 'settings:update', data: settings });
       } catch (e) {
-        console.warn('Failed to broadcast settings after team delete:', e?.message || e);
+        console.warn('Failed to broadcast settings after team delete:', (e as any)?.message || e);
       }
 
       try {
         const leaderboardData = await computeLeaderboard();
         broadcastToAll({ type: 'leaderboard:update', data: leaderboardData });
       } catch (e) {
-        console.warn('Failed to recompute leaderboard after team delete:', e?.message || e);
+        console.warn('Failed to recompute leaderboard after team delete:', (e as any)?.message || e);
       }
 
       res.json({ message: 'Team deleted' });

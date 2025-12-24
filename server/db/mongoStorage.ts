@@ -270,6 +270,8 @@ export class MongoStorage implements IStorage {
   async getAgent(id: string): Promise<Agent | undefined> {
     const agent = await AgentModel.findById(id).lean();
     if (!agent) return undefined;
+    const todaySubmissions = (agent as any).todaySubmissions ?? 0;
+
     return {
       id: agent._id.toString(),
       name: agent.name,
@@ -279,6 +281,7 @@ export class MongoStorage implements IStorage {
       activations: agent.activations,
       submissions: agent.submissions,
       points: agent.points,
+      todaySubmissions,
       lastSubmissionReset: agent.lastSubmissionReset,
       userId: agent.userId || undefined,
       email: agent.email || undefined
@@ -292,15 +295,15 @@ export class MongoStorage implements IStorage {
       id: agent._id.toString(),
       name: agent.name,
       photoUrl: agent.photoUrl,
-      teamId: agent.teamId,
+      teamId: agent.teamId || undefined,
       activationTarget: agent.activationTarget,
       activations: agent.activations,
       submissions: agent.submissions,
       points: agent.points,
       todaySubmissions: agent.todaySubmissions ?? 0,
       lastSubmissionReset: agent.lastSubmissionReset,
-      userId: agent.userId,
-      email: agent.email
+      userId: agent.userId || undefined,
+      email: agent.email || undefined
     };
   }
 
@@ -311,15 +314,15 @@ export class MongoStorage implements IStorage {
       id: agent._id.toString(),
       name: agent.name,
       photoUrl: agent.photoUrl,
-      teamId: agent.teamId,
+      teamId: agent.teamId || undefined,
       activationTarget: agent.activationTarget,
       activations: agent.activations,
       submissions: agent.submissions,
       points: agent.points,
       todaySubmissions: agent.todaySubmissions ?? 0,
       lastSubmissionReset: agent.lastSubmissionReset,
-      userId: agent.userId,
-      email: agent.email
+      userId: agent.userId || undefined,
+      email: agent.email || undefined
     };
   }
 

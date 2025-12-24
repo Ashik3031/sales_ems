@@ -85,7 +85,7 @@ export const agents = {
   id: z.string(),
   name: z.string(),
   photoUrl: z.string(),
-  teamId: z.string(),
+  teamId: z.string().optional(),
   activationTarget: z.number(),
   activations: z.number(),
   submissions: z.number(),
@@ -97,7 +97,7 @@ export const agents = {
 export const insertAgentSchema = z.object({
   name: z.string().min(1),
   photoUrl: z.string().min(1),
-  teamId: z.string(),
+  teamId: z.string().optional(),
   activationTarget: z.number().min(1),
   activations: z.number().default(0),       // monthly activations
   submissions: z.number().default(0),       // monthly submissions
