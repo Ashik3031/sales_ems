@@ -75,14 +75,14 @@ const topAgentToday =
 
   return {
     topAgentMonth: {
-      name: topAgentMonth.name,
-      photoUrl: topAgentMonth.photoUrl,
-      activations: topAgentMonth.activations ?? 0,
+      name: topAgentMonth?.name ?? 'No agents',
+      photoUrl: topAgentMonth?.photoUrl ?? '',
+      activations: topAgentMonth?.activations ?? 0,
     },
     topAgentToday: {
-      name: topAgentToday.name,
-      photoUrl: topAgentToday.photoUrl,
-      todaySubmissions: (topAgentToday as any).todaySubmissions ?? 0,
+      name: topAgentToday?.name ?? 'No agents',
+      photoUrl: topAgentToday?.photoUrl ?? '',
+      todaySubmissions: (topAgentToday as any)?.todaySubmissions ?? 0,
     },
     totalActivations,
     totalSubmissions,

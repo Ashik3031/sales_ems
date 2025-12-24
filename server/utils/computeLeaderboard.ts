@@ -1,11 +1,11 @@
 import { storage } from '../storage';
 import { Team, Agent } from '@shared/schema';
 
-export interface TeamWithAgents extends Team {
+export type TeamWithAgents = Omit<Team, 'agents'> & {
   agents: Agent[];
   tlName: string;
   tlPhotoUrl: string;
-}
+};
 
 export interface LeaderboardData {
   teams: TeamWithAgents[];

@@ -18,9 +18,19 @@ export class MongoStorage implements IStorage {
 
   async getLeaveRequestsByTeamId(teamId: string): Promise<(LeaveRequest & { user: User })[]> {
     // 1. Get all users in this team
-    const users = await UserModel.find({ teamId });
+    const users = await UserModel.find({ teamId }).lean();
     const userIds = users.map(u => u._id.toString());
-    const userMap = new Map(users.map(u => [u._id.toString(), { ...u.toObject(), id: u._id.toString() }]));
+    const userMap = new Map(users.map(u => [u._id.toString(), {
+      id: u._id.toString(),
+      name: u.name,
+      email: u.email,
+      passwordHash: u.passwordHash,
+      role: u.role as 'admin' | 'tl' | 'employee',
+      teamId: (u as any).teamId || undefined,
+      avatarUrl: (u as any).avatarUrl || undefined,
+      contactNumber: (u as any).contactNumber || undefined,
+      jobRole: (u as any).jobRole || undefined,
+    } as User]));
 
     // 2. Get requests for these users
     const leaves = await LeaveRequestModel.find({ userId: { $in: userIds } }).sort({ createdAt: -1 });
@@ -57,8 +67,18 @@ export class MongoStorage implements IStorage {
 
     // Get all users referenced
     const userIds = [...new Set(leaves.map(l => l.userId))];
-    const users = await UserModel.find({ _id: { $in: userIds } });
-    const userMap = new Map(users.map(u => [u._id.toString(), { ...u.toObject(), id: u._id.toString() } as User]));
+    const users = await UserModel.find({ _id: { $in: userIds } }).lean();
+    const userMap = new Map(users.map(u => [u._id.toString(), {
+      id: u._id.toString(),
+      name: u.name,
+      email: u.email,
+      passwordHash: u.passwordHash,
+      role: u.role as 'admin' | 'tl' | 'employee',
+      teamId: (u as any).teamId || undefined,
+      avatarUrl: (u as any).avatarUrl || undefined,
+      contactNumber: (u as any).contactNumber || undefined,
+      jobRole: (u as any).jobRole || undefined,
+    } as User]));
 
     // Get all teams for those users
     const teamIds = [...new Set(users.map(u => u.teamId).filter(Boolean))];
@@ -254,14 +274,14 @@ export class MongoStorage implements IStorage {
       id: agent._id.toString(),
       name: agent.name,
       photoUrl: agent.photoUrl,
-      teamId: agent.teamId,
+      teamId: agent.teamId || undefined,
       activationTarget: agent.activationTarget,
       activations: agent.activations,
       submissions: agent.submissions,
       points: agent.points,
       lastSubmissionReset: agent.lastSubmissionReset,
-      userId: agent.userId,
-      email: agent.email
+      userId: agent.userId || undefined,
+      email: agent.email || undefined
     };
   }
 
@@ -542,13 +562,13 @@ export class MongoStorage implements IStorage {
             await fs.unlink(filePath);
           } catch (err) {
             // ignore errors (file may not exist)
-            console.warn('Failed to remove previous notification sound:', err?.message || err);
+            console.warn('Failed to remove previous notification sound:', (err as any)?.message || err);
           }
         }
       }
     } catch (err) {
       // Non-fatal
-      console.warn('Error while cleaning up previous notification sound:', err?.message || err);
+      console.warn('Error while cleaning up previous notification sound:', (err as any)?.message || err);
     }
 
     const updated = await SystemSettingsModel.findOneAndUpdate(

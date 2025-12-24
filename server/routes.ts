@@ -737,15 +737,20 @@ export async function registerRoutes(app: Express): Promise<Server> {
         avatarUrl: `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&background=random`
       });
 
-      // Create Team for this TL
+      // Create Team for this TL (include required defaults)
       await storage.createTeam({
         name: teamName,
-        tlId: user.id
+        tlId: user.id,
+        agents: [],
+        avgActivation: 0,
+        totalActivations: 0,
+        totalSubmissions: 0,
+        totalPoints: 0
       });
 
       res.status(201).json({ user });
     } catch (e) {
-      console.error("Create TL error:", e);
+      console.error("Create TL error:", (e as any)?.message || e);
       res.status(500).json({ message: "Failed to create Team Leader" });
     }
   });
@@ -835,7 +840,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           broadcastToAll({ type: 'leaderboard:update', data: leaderboardData });
         }
       } catch (e) {
-        console.error('Agent linking/creation failed during registration:', e);
+        console.error('Agent linking/creation failed during registration:', (e as any)?.message || e);
       }
 
       return res.status(201).json({
