@@ -1,5 +1,5 @@
-import { storage } from "../storage.js";
-import type { Agent } from "../shared/schema.js";
+import { storage } from "../storage.ts";
+import type { Agent } from "../shared/schema.ts";
 
 export interface TopStats {
   topAgentMonth: {
