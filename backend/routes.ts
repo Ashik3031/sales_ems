@@ -8,12 +8,12 @@ import rateLimit from "express-rate-limit";
 import multer from "multer";
 import fs from "fs";
 import path from "path";
-import { storage } from "./storage.ts";
-import { authenticate, requireRole, requireTLOrAdmin } from "./middleware/auth.ts";
-import { log } from "./utils/log.ts";
-import { computeLeaderboard } from "./utils/computeLeaderboard.ts";
+import { storage } from "./storage.js";
+import { authenticate, requireRole, requireTLOrAdmin } from "./middleware/auth.js";
+import { log } from "./utils/log.js";
+import { computeLeaderboard } from "./utils/computeLeaderboard.js";
 
-import { computeTopStats } from "./utils/topStats.ts";
+import { computeTopStats } from "./utils/topStats.js";
 import {
   loginSchema,
   tlUpdateSchema,
@@ -23,7 +23,7 @@ import {
   insertUserSchema,
   insertLeaveRequestSchema,
   insertSystemSettingsSchema,
-} from "./shared/schema.ts";
+} from "./shared/schema.js";
 import { ZodError } from "zod";
 
 async function hashPassword(password: string) {
@@ -526,7 +526,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     async (req, res) => {
       try {
         const agentId = req.params.id;
-        const { activationTarget } = (await import("./shared/schema.ts")).tlSetTargetSchema.parse({ agentId, activationTarget: req.body.activationTarget });
+        const { activationTarget } = (await import("./shared/schema.js")).tlSetTargetSchema.parse({ agentId, activationTarget: req.body.activationTarget });
 
         const agent = await storage.getAgent(agentId);
         if (!agent) {

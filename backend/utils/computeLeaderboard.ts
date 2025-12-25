@@ -1,5 +1,5 @@
-import { storage } from '../storage.ts';
-import { Team, Agent } from '../shared/schema.ts';
+import { storage } from '../storage.js';
+import { Team, Agent } from '../shared/schema.js';
 
 export type TeamWithAgents = Omit<Team, 'agents'> & {
   agents: Agent[];
