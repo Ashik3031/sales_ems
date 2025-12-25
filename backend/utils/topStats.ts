@@ -1,4 +1,4 @@
-import { storage } from "../storage";
+import { storage } from "../storage.js";
 import type { Agent } from "@shared/schema";
 
 export interface TopStats {
@@ -41,21 +41,21 @@ export const computeTopStats = async (): Promise<TopStats> => {
   }
 
   const topAgentMonth =
-  allAgents.length > 0
-    ? allAgents.reduce((top, agent) =>
+    allAgents.length > 0
+      ? allAgents.reduce((top, agent) =>
         (agent.activations ?? 0) > (top.activations ?? 0) ? agent : top
       )
-    : null;
+      : null;
 
-// 🔹 Top agent by TODAY submissions (todaySubmissions)
-const topAgentToday =
-  allAgents.length > 0
-    ? allAgents.reduce((top, agent) => {
+  // 🔹 Top agent by TODAY submissions (todaySubmissions)
+  const topAgentToday =
+    allAgents.length > 0
+      ? allAgents.reduce((top, agent) => {
         const topToday = (top as any).todaySubmissions ?? 0;
         const currentToday = (agent as any).todaySubmissions ?? 0;
         return currentToday > topToday ? agent : top;
       })
-    : null;
+      : null;
 
   // 🔹 Monthly totals
   const totalActivations = allAgents.reduce(

@@ -1,8 +1,8 @@
 import { type User, type InsertUser, type Team, type InsertTeam, type Agent, type InsertAgent, type Notification, type InsertNotification, type Booking, type InsertBooking, type LeaveRequest, type InsertLeaveRequest, type SystemSettings, type InsertSystemSettings, type AgentHistory } from "@shared/schema";
-import { UserModel, TeamModel, AgentModel, NotificationModel, BookingModel, LeaveRequestModel, SystemSettingsModel, AgentHistoryModel } from "./models";
+import { UserModel, TeamModel, AgentModel, NotificationModel, BookingModel, LeaveRequestModel, SystemSettingsModel, AgentHistoryModel } from "./models.js";
 import path from 'path';
 import fs from 'fs/promises';
-import { IStorage } from "../storage";
+import { IStorage } from "../storage.js";
 
 export class MongoStorage implements IStorage {
   // Leave Request Methods

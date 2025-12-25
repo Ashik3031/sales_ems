@@ -8,12 +8,12 @@ import rateLimit from "express-rate-limit";
 import multer from "multer";
 import fs from "fs";
 import path from "path";
-import { storage } from "./storage";
-import { authenticate, requireRole, requireTLOrAdmin } from "./middleware/auth";
-import { log } from "./utils/log";
-import { computeLeaderboard } from "./utils/computeLeaderboard";
+import { storage } from "./storage.js";
+import { authenticate, requireRole, requireTLOrAdmin } from "./middleware/auth.js";
+import { log } from "./utils/log.js";
+import { computeLeaderboard } from "./utils/computeLeaderboard.js";
 
-import { computeTopStats } from "./utils/topStats";
+import { computeTopStats } from "./utils/topStats.js";
 import {
   loginSchema,
   tlUpdateSchema,

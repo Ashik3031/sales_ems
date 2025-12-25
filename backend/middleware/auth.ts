@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import jwt from 'jsonwebtoken';
-import { storage } from '../storage';
+import { storage } from '../storage.js';
 import { User as SchemaUser } from '@shared/schema';
 
 declare global {

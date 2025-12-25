@@ -2,14 +2,14 @@ import path from "path";
 import { fileURLToPath } from "url";
 
 import express, { type Request, type Response, type NextFunction } from "express";
-import { registerRoutes } from "./routes";
-import { log } from "./utils/log";
+import { registerRoutes } from "./routes.js";
+import { log } from "./utils/log.js";
 
 import fs from "fs";
 
-import { seedData } from "./seed";
-import { storage } from "./storage";
-import { connectToMongoDB } from "./db/connection";
+import { seedData } from "./seed.js";
+import { storage } from "./storage.js";
+import { connectToMongoDB } from "./db/connection.js";
 import dotenv from "dotenv";
 
 const __filename = fileURLToPath(import.meta.url);

@@ -1,4 +1,4 @@
-import { storage } from './storage';
+import { storage } from './storage.js';
 import bcrypt from 'bcryptjs';
 
 export async function seedData() {
@@ -10,9 +10,9 @@ export async function seedData() {
 
   // Passwords
   const adminPasswordHash = await bcrypt.hash(process.env.ADMIN_PASSWORD || 'admin123', 10);
-  const tl1PasswordHash   = await bcrypt.hash(process.env.TL1_PASSWORD || 'tl1-pass', 10);
-  const tl2PasswordHash   = await bcrypt.hash(process.env.TL2_PASSWORD || 'tl2-pass', 10);
-  const tl3PasswordHash   = await bcrypt.hash(process.env.TL3_PASSWORD || 'tl2-pass', 10);
+  const tl1PasswordHash = await bcrypt.hash(process.env.TL1_PASSWORD || 'tl1-pass', 10);
+  const tl2PasswordHash = await bcrypt.hash(process.env.TL2_PASSWORD || 'tl2-pass', 10);
+  const tl3PasswordHash = await bcrypt.hash(process.env.TL3_PASSWORD || 'tl2-pass', 10);
 
   // Users
   const admin = await storage.createUser({
