@@ -59,13 +59,18 @@ class SocketManager {
     }
   }
 
+
+
   private handleMessage(message: any) {
+    console.log('[Socket] Received message:', message.type, message.data);
+
     switch (message.type) {
       case 'leaderboard:update':
         useLeaderboardStore.getState().updateFromSocket(message.data);
         break;
 
       case 'sale:activation':
+        console.log('[Socket] Triggering celebration:', message.data);
         // Trigger celebration popup and sound
         const celebrationData = message.data;
         useAudioStore.getState().playActivationSound();
@@ -77,6 +82,7 @@ class SocketManager {
         break;
 
       case 'notification:active':
+        console.log('[Socket] Activating notification:', message.data);
         useNotificationStore.getState().setActiveNotification(message.data);
         break;
 
@@ -86,6 +92,7 @@ class SocketManager {
         break;
 
       case 'notification:clear':
+        console.log('[Socket] Clearing notification');
         useNotificationStore.getState().clearNotification();
         break;
 
@@ -96,7 +103,7 @@ class SocketManager {
         break;
 
       default:
-        // Unknown message - intentionally ignored
+        console.warn('[Socket] Unknown message type:', message.type);
     }
   }
 

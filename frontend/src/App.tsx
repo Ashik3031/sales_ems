@@ -38,7 +38,7 @@ function Router() {
   return (
     <Switch>
       <Route path="/">
-        <RequireAuth roles={['admin','tl']}>
+        <RequireAuth roles={['admin', 'tl']}>
           <Leaderboard />
         </RequireAuth>
       </Route>
@@ -115,9 +115,48 @@ function App() {
           <Router />
         </main>
         <NotificationTakeover />
+        <GlobalCelebration />
       </div>
       <Toaster />
     </QueryClientProvider>
+  );
+}
+
+import CelebrationPopup from "@/components/CelebrationPopup";
+import { useState, useRef } from "react";
+
+function GlobalCelebration() {
+  const [celebrationData, setCelebrationData] = useState<any | null>(null);
+  const [showCelebration, setShowCelebration] = useState(false);
+  const lastCelebrationRef = useRef<string>("");
+
+  useEffect(() => {
+    const handleCelebration = (event: CustomEvent<any>) => {
+      console.log('[GlobalCelebration] Received event:', event.detail);
+      const newData = event.detail;
+      // Include timestamp in the unique key to allow same-count celebrations (e.g. if persistence fails or manual triggers)
+      const uniqueKey = `${newData.agentId}-${newData.newActivationCount}-${newData.timestamp}`;
+
+      if (lastCelebrationRef.current === uniqueKey) {
+        console.log('[GlobalCelebration] Ignoring duplicate');
+        return;
+      }
+
+      lastCelebrationRef.current = uniqueKey;
+      setCelebrationData(newData);
+      setShowCelebration(true);
+    };
+
+    window.addEventListener('show-celebration', handleCelebration as EventListener);
+    return () => window.removeEventListener('show-celebration', handleCelebration as EventListener);
+  }, []);
+
+  return (
+    <CelebrationPopup
+      isVisible={showCelebration}
+      data={celebrationData}
+      onClose={() => setShowCelebration(false)}
+    />
   );
 }
 

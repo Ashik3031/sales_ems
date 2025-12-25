@@ -1,10 +1,9 @@
-import { useEffect, useState, useRef } from 'react';
+import { useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { useSocket } from '@/hooks/useSocket';
 import { useLeaderboardStore } from '@/store/leaderboardStore';
 import TopStats from '@/components/TopStats';
 import TeamCard from '@/components/TeamCard';
-import CelebrationPopup from '@/components/CelebrationPopup';
 
 interface CelebrationData {
   agentId: string;
@@ -19,17 +18,13 @@ interface CelebrationData {
 
 export default function Leaderboard() {
   const { teams, topStats, setTeams, setTopStats, setLoading } = useLeaderboardStore();
-  const [celebrationData, setCelebrationData] = useState<CelebrationData | null>(null);
-  const [showCelebration, setShowCelebration] = useState(false);
 
   useSocket();
 
   const { data, isLoading, error } = useQuery<{ teams: any[], topStats: any }>({
     queryKey: ['/api/stats/leaderboard'],
-    refetchInterval: 30000, // Refetch every 30 seconds as backup
+    refetchInterval: 30000,
   });
-
-  const lastCelebrationRef = useRef<string>("");
 
   useEffect(() => {
     if (data) {
@@ -38,29 +33,6 @@ export default function Leaderboard() {
       setLoading(false);
     }
   }, [data, setTeams, setTopStats, setLoading]);
-
-  useEffect(() => {
-    const handleCelebration = (event: CustomEvent<CelebrationData>) => {
-      const newData = event.detail;
-      const uniqueKey = `${newData.agentId}-${newData.newActivationCount}`;
-
-      // Prevent duplicate celebrations for the same achievement
-      // This handles cases where the socket event might be received twice or processed twice
-      if (lastCelebrationRef.current === uniqueKey) {
-        return;
-      }
-
-      lastCelebrationRef.current = uniqueKey;
-      setCelebrationData(newData);
-      setShowCelebration(true);
-    };
-
-    window.addEventListener('show-celebration', handleCelebration as EventListener);
-
-    return () => {
-      window.removeEventListener('show-celebration', handleCelebration as EventListener);
-    };
-  }, []);
 
   if (error) {
     return (
@@ -105,13 +77,6 @@ export default function Leaderboard() {
           </div>
         )}
       </div>
-
-      {/* Celebration Popup */}
-      <CelebrationPopup
-        isVisible={showCelebration}
-        data={celebrationData}
-        onClose={() => setShowCelebration(false)}
-      />
     </div>
   );
 }

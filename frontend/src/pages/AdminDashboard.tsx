@@ -140,6 +140,7 @@ export default function AdminDashboard() {
   const [newTLEmail, setNewTLEmail] = useState('');
   const [newTLPassword, setNewTLPassword] = useState('');
   const [newTLTeam, setNewTLTeam] = useState('');
+  const [newTLPhotoUrl, setNewTLPhotoUrl] = useState('');
 
   const handleCreateTL = (e: React.FormEvent) => {
     e.preventDefault();
@@ -147,7 +148,8 @@ export default function AdminDashboard() {
       name: newTLName,
       email: newTLEmail,
       password: newTLPassword,
-      teamName: newTLTeam
+      teamName: newTLTeam,
+      avatarUrl: newTLPhotoUrl || undefined
     });
     // Clear form
     setNewTLName('');
@@ -611,13 +613,39 @@ export default function AdminDashboard() {
                 />
               </div>
               <div className="space-y-2">
-                <Label>Team Name</Label>
                 <Input
                   value={newTLTeam}
                   onChange={(e) => setNewTLTeam(e.target.value)}
                   placeholder="e.g. Sales Hawks"
                   required
                 />
+              </div>
+              <div className="space-y-2">
+                <Label>Profile Photo (Optional)</Label>
+                <div className="flex items-center gap-2">
+                  <Input
+                    type="file"
+                    accept="image/*"
+                    onChange={(e) => {
+                      const file = e.target.files?.[0];
+                      if (file) {
+                        const formData = new FormData();
+                        formData.append('file', file);
+                        uploadFileMutation.mutate(formData, {
+                          onSuccess: (data) => setNewTLPhotoUrl(data.url)
+                        });
+                      }
+                    }}
+                    disabled={uploadFileMutation.isPending}
+                  />
+                  {newTLPhotoUrl && (
+                    <img
+                      src={newTLPhotoUrl}
+                      alt="Preview"
+                      className="w-10 h-10 rounded-full object-cover border"
+                    />
+                  )}
+                </div>
               </div>
               <Button type="submit" disabled={createTLMutation.isPending}>
                 {createTLMutation.isPending ? 'Creating...' : 'Create Team Leader'}

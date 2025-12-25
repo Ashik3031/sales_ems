@@ -60,7 +60,7 @@ export default function NotificationTakeover() {
       if (notificationSoundRef.current) {
         try {
           notificationSoundRef.current.pause();
-        } catch {}
+        } catch { }
         notificationSoundRef.current.src = '';
         notificationSoundRef.current = null;
       }
@@ -176,6 +176,7 @@ export default function NotificationTakeover() {
         );
 
       case "audio":
+        console.log('[NotificationTakeover] Rendering audio with src:', activeNotification.mediaUrl);
         return (
           <div className="space-y-6">
             <div className="text-6xl mb-8">🎵</div>
@@ -186,6 +187,8 @@ export default function NotificationTakeover() {
               className="w-full max-w-md mx-auto"
               data-testid="notification-audio"
               src={activeNotification.mediaUrl}
+              onError={(e) => console.error('[NotificationTakeover] Audio error:', e.currentTarget.error, 'src:', e.currentTarget.src)}
+              onPlay={() => console.log('[NotificationTakeover] Audio started playing')}
             >
               Your browser does not support the audio element.
             </audio>

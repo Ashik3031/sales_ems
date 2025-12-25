@@ -61,11 +61,57 @@ const upload = multer({
   limits: { fileSize: 50 * 1024 * 1024 } // 50MB limit
 });
 
+// Force restart
+import { getAudioUrl } from 'google-tts-api';
+
 export async function registerRoutes(app: Express): Promise<Server> {
   const httpServer = createServer(app);
 
   // Serve uploaded files statically
   app.use("/uploads", express.static(uploadDir));
+
+  // TTS Endpoint
+  app.get("/api/tts", async (req, res) => {
+    try {
+      const text = req.query.text as string;
+      if (!text) {
+        return res.status(400).send('Text query parameter required');
+      }
+
+      // Generate Google TTS URL (Malayalam 'ml' or English 'en')
+      // The frontend sends Malayalamish text, so 'ml' might be better or 'hi'
+      // But user prompted specifically for that string.
+      const url = getAudioUrl(text, {
+        lang: 'ml',
+        slow: false,
+        host: 'https://translate.google.com',
+      });
+
+      // Stream the audio back
+      console.log(`[TTS] Fetching audio from: ${url}`);
+      const audioRes = await fetch(url, {
+        headers: {
+          'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36',
+          'Referer': 'https://translate.google.com/'
+        }
+      });
+
+      if (!audioRes.ok) {
+        console.error(`[TTS] Upstream Google Error: ${audioRes.status} ${audioRes.statusText}`);
+        return res.status(502).send(`Upstream Error: ${audioRes.statusText}`);
+      }
+
+      const arrayBuffer = await audioRes.arrayBuffer();
+      const buffer = Buffer.from(arrayBuffer);
+      console.log(`[TTS] Successfully fetched ${buffer.length} bytes`);
+
+      res.set('Content-Type', 'audio/mpeg');
+      res.send(buffer);
+    } catch (error: any) {
+      console.error('TTS Error:', error?.message || error);
+      res.status(500).send('TTS Failed');
+    }
+  });
 
   // File upload endpoint
   app.post("/api/upload", upload.single("file"), (req, res) => {
@@ -300,6 +346,23 @@ export async function registerRoutes(app: Express): Promise<Server> {
           jobRole: updatedUser.jobRole,
         }
       });
+
+      // SYNC: Also update the Agent record if it exists so the leaderboard reflects the change
+      try {
+        const agent = await storage.getAgentByUserId(updatedUser.id);
+        if (agent) {
+          await storage.updateAgent(agent.id, { photoUrl: avatarUrl });
+
+          // Recompute and broadcast leaderboard
+          const leaderboardData = await computeLeaderboard();
+          broadcastToAll({
+            type: "leaderboard:update",
+            data: leaderboardData,
+          });
+        }
+      } catch (e) {
+        console.error("Failed to sync agent profile photo:", e);
+      }
     } catch (error) {
       console.error("Update profile photo error:", error);
       res.status(500).json({ message: "Failed to update profile photo" });
@@ -454,6 +517,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
         const updates: Partial<typeof agent> = {};
 
+
         // 🔹 Submissions: update total + today, trigger celebration
         if (delta.submissions !== undefined) {
           const newTotalSubmissions = Math.max(
@@ -467,11 +531,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
             prevToday + delta.submissions
           );
 
+          console.log(`[DEBUG] Incrementing submissions for agent ${agentId}`);
+          console.log(`[DEBUG] Prev Total: ${agent.submissions}, New Total: ${newTotalSubmissions}`);
+          console.log(`[DEBUG] Prev Today (DB): ${prevToday}, New Today: ${newTodaySubmissions}`);
+
           updates.submissions = newTotalSubmissions;
           (updates as any).todaySubmissions = newTodaySubmissions;
 
           // 🎉 Celebration on submission increment
           if (delta.submissions > 0) {
+            console.log('[DEBUG] Triggering celebration broadcast');
             // Fetch team to get custom music (guard if agent has a team)
             const agentTeam = agent.teamId ? await storage.getTeam(agent.teamId) : undefined;
 
@@ -502,6 +571,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           updates.points = Math.max(0, agent.points + delta.points);
         }
 
+        console.log('[DEBUG] Applying updates to DB:', updates);
         const updatedAgent = await storage.updateAgent(agentId, updates);
 
         // Recompute and broadcast leaderboard
@@ -737,8 +807,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         email,
         passwordHash,
         role: "tl",
-        // Default avatar
-        avatarUrl: `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&background=random`
+        // Use provided avatar or generate default
+        avatarUrl: req.body.avatarUrl || `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&background=random`
       });
 
       // Create Team for this TL (include required defaults)
