@@ -1,4 +1,4 @@
-import { type User, type InsertUser, type Team, type InsertTeam, type Agent, type InsertAgent, type Notification, type InsertNotification, type Booking, type InsertBooking, type LeaveRequest, type InsertLeaveRequest, type SystemSettings, type InsertSystemSettings, type AgentHistory, type InsertAgentHistory } from "@shared/schema";
+import { type User, type InsertUser, type Team, type InsertTeam, type Agent, type InsertAgent, type Notification, type InsertNotification, type Booking, type InsertBooking, type LeaveRequest, type InsertLeaveRequest, type SystemSettings, type InsertSystemSettings, type AgentHistory, type InsertAgentHistory } from "./shared/schema.js";
 import { randomUUID } from "crypto";
 
 export interface IStorage {

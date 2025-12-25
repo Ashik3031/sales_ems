@@ -23,7 +23,7 @@ import {
   insertUserSchema,
   insertLeaveRequestSchema,
   insertSystemSettingsSchema,
-} from "@shared/schema";
+} from "./shared/schema.js";
 import { ZodError } from "zod";
 
 async function hashPassword(password: string) {
@@ -526,7 +526,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     async (req, res) => {
       try {
         const agentId = req.params.id;
-        const { activationTarget } = (await import("@shared/schema")).tlSetTargetSchema.parse({ agentId, activationTarget: req.body.activationTarget });
+        const { activationTarget } = (await import("./shared/schema.js")).tlSetTargetSchema.parse({ agentId, activationTarget: req.body.activationTarget });
 
         const agent = await storage.getAgent(agentId);
         if (!agent) {

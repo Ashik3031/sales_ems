@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
 import jwt from 'jsonwebtoken';
 import { storage } from '../storage.js';
-import { User as SchemaUser } from '@shared/schema';
+import { User as SchemaUser } from '../shared/schema.js';
 
 declare global {
   namespace Express {
