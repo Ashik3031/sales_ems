@@ -13,6 +13,10 @@ import { authenticate, requireRole, requireTLOrAdmin } from "./middleware/auth.j
 import { log } from "./utils/log.js";
 import { computeLeaderboard } from "./utils/computeLeaderboard.js";
 
+import { Server as HttpServer } from "http";
+import { Server as IOServer } from "socket.io";
+
+
 import { computeTopStats } from "./utils/topStats.js";
 import {
   loginSchema,
@@ -67,12 +71,33 @@ import { getAudioUrl } from 'google-tts-api';
 export async function registerRoutes(app: Express): Promise<Server> {
   const httpServer = createServer(app);
 
+  const io = new IOServer(httpServer, {
+    path: "/api/socket.io",
+    cors: {
+      origin: "*", // tighten later
+    },
+  });
+
+  io.on("connection", (socket) => {
+    console.log("🟢 WebSocket connected:", socket.id);
+
+    socket.on("disconnect", () => {
+      console.log("🔴 WebSocket disconnected:", socket.id);
+    });
+
+    // Example event
+    socket.on("leaderboard:update", () => {
+      io.emit("leaderboard:refresh");
+    });
+  });
+
+
   // Serve uploaded files statically
   app.use("/uploads", express.static(uploadDir));
 
   // TTS Endpoint
   app.get("/api/tts", async (req, res) => {
-    try {
+    try {   
       const text = req.query.text as string;
       if (!text) {
         return res.status(400).send('Text query parameter required');
